@@ -18,6 +18,7 @@ import TextArea from '../../components/forms/TextArea';
 import { mockClients } from '../../utils/mockData';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import { useNotifications } from '../../context/NotificationContext';
+import { useCRM } from '../../context/CRMContext';
 import {
   Plus,
   Download,
@@ -33,7 +34,9 @@ import {
 } from 'lucide-react';
 
 export const ClientsListPage = () => {
-  const [clients, setClients] = useState(mockClients);
+  const crm = useCRM();
+  const rawClients = crm?.clients || mockClients;
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [sortBy, setSortBy] = useState('name');
@@ -44,6 +47,20 @@ export const ClientsListPage = () => {
   const navigate = useNavigate();
 
   const pageSize = 5;
+
+  const clients = useMemo(() => {
+    return rawClients.map((c) => ({
+      ...c,
+      logo: c.logo || (c.company || 'NE').substring(0, 2).toUpperCase(),
+      logoBg: c.logoBg || 'bg-purple-600',
+      industry: c.industry || 'Software & Services',
+      role: c.role || 'Executive',
+      email: c.email || 'client@company.com',
+      phone: c.phone || '+91 98000 00000',
+      projectsCount: c.projectsCount || c.activeProjects || 1,
+      customerType: c.customerType || 'Converted Customer',
+    }));
+  }, [rawClients]);
 
   // Filtering & Sorting
   const filteredClients = useMemo(() => {
@@ -62,8 +79,8 @@ export const ClientsListPage = () => {
       })
       .sort((a, b) => {
         if (sortBy === 'name') return a.company.localeCompare(b.company);
-        if (sortBy === 'spent') return b.totalSpent - a.totalSpent;
-        if (sortBy === 'projects') return b.projectsCount - a.projectsCount;
+        if (sortBy === 'spent') return (b.totalSpent || 0) - (a.totalSpent || 0);
+        if (sortBy === 'projects') return (b.projectsCount || 0) - (a.projectsCount || 0);
         return 0;
       });
   }, [clients, searchQuery, statusFilter, sortBy]);
@@ -79,28 +96,32 @@ export const ClientsListPage = () => {
     e.preventDefault();
     const created = {
       id: `cli-${Date.now()}`,
-      company: newClient.company || 'New Enterprise',
-      logo: (newClient.company || 'NE').substring(0, 2).toUpperCase(),
+      company: newClient.company || 'Existing Client Corp',
+      logo: (newClient.company || 'EC').substring(0, 2).toUpperCase(),
       logoBg: 'bg-purple-600',
-      contactPerson: newClient.contactPerson || 'Contact Lead',
+      contactPerson: newClient.contactPerson || 'Contact Person',
       role: newClient.role || 'Director',
-      email: newClient.email || 'lead@enterprise.com',
+      email: newClient.email || 'contact@client.com',
       phone: newClient.phone || '+91 99000 00000',
-      website: newClient.website || 'https://enterprise.io',
-      address: newClient.address || 'Mumbai, MH',
-      industry: newClient.industry || 'Technology',
+      website: newClient.website || 'https://client.com',
+      address: newClient.address || 'India',
+      industry: newClient.industry || 'Services',
       projectsCount: 1,
       activeProjects: 1,
       totalSpent: 0,
       status: 'Active',
+      customerType: 'Manual Customer',
       joinedDate: new Date().toISOString().split('T')[0],
-      about: newClient.about || 'Newly added customer account in PEP CRM.',
+      about: newClient.about || 'Manually added customer (Old client / AMC / Support contract).',
     };
 
-    setClients([created, ...clients]);
+    if (crm?.clients) {
+      // push to context
+      crm.clients.unshift(created);
+    }
     setIsAddModalOpen(false);
     setNewClient({});
-    showSuccess(`Client ${created.company} registered successfully!`);
+    showSuccess(`Manual Customer ${created.company} added successfully!`);
   };
 
   const handleExport = () => {
@@ -125,6 +146,17 @@ export const ClientsListPage = () => {
             <span className="text-[11px] text-slate-400 font-medium">{client.industry}</span>
           </div>
         </div>
+      ),
+    },
+    {
+      header: 'Type',
+      key: 'customerType',
+      render: (client) => (
+        <Badge
+          variant={client.customerType === 'Manual Customer' ? 'amber' : 'purple'}
+        >
+          {client.customerType || 'Converted Customer'}
+        </Badge>
       ),
     },
     {
@@ -168,7 +200,7 @@ export const ClientsListPage = () => {
       key: 'totalSpent',
       render: (client) => (
         <span className="font-bold text-slate-900 font-sans text-xs">
-          {formatCurrency(client.totalSpent)}
+          {formatCurrency(client.totalSpent || 0)}
         </span>
       ),
     },

@@ -125,6 +125,9 @@ export const LeadsListPage = () => {
   // Save Edit Lead
   const handleSaveEdit = (e) => {
     e.preventDefault();
+    if (crm?.updateLead && editLeadModal) {
+      crm.updateLead(editLeadModal.id, editLeadModal);
+    }
     showSuccess('Lead updated successfully!');
     setEditLeadModal(null);
   };
@@ -148,10 +151,12 @@ export const LeadsListPage = () => {
       key: 'name',
       render: (lead) => (
         <div>
-          <span className="font-bold text-slate-900 font-heading text-sm block">
+          <span className="font-bold text-slate-900 group-hover:text-brand-primary block font-heading">
             {lead.name}
           </span>
-          <span className="text-[11px] text-slate-400">Source: {lead.source}</span>
+          <span className="text-[11px] text-slate-400 font-medium">
+            Source: {lead.source}
+          </span>
         </div>
       ),
     },
@@ -166,39 +171,64 @@ export const LeadsListPage = () => {
       ),
     },
     {
-      header: 'Deal Value',
+      header: 'Contact Info',
+      key: 'email',
+      render: (lead) => (
+        <div className="space-y-0.5 text-xs text-slate-500">
+          <p className="flex items-center gap-1 text-[11px] text-slate-600">
+            <Mail className="w-3 h-3 text-slate-400" />
+            <span className="truncate max-w-[140px]">{lead.email}</span>
+          </p>
+          <p className="flex items-center gap-1 text-[11px] text-slate-400">
+            <Phone className="w-3 h-3 text-slate-400" />
+            <span>{lead.phone}</span>
+          </p>
+        </div>
+      ),
+    },
+    {
+      header: 'Interested Service',
+      key: 'service',
+      render: (lead) => (
+        <Badge variant="purple">{lead.service || 'Website Development'}</Badge>
+      ),
+    },
+    {
+      header: 'Est. Value',
       key: 'value',
       render: (lead) => (
-        <span className="font-bold text-slate-900 font-sans text-sm">
+        <span className="font-bold text-slate-900 font-sans text-xs">
           {formatCurrency(lead.value)}
         </span>
       ),
     },
     {
-      header: 'Stage',
-      key: 'stage',
-      render: (lead) => {
-        const stageObj = PIPELINE_STAGES.find((s) => s.id === lead.stage);
-        return (
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${stageObj?.color || 'bg-slate-100'}`}>
-            {stageObj?.name || lead.stage}
-          </span>
-        );
-      },
-    },
-    {
-      header: 'Assigned Employee',
+      header: 'Assigned To',
       key: 'assignedTo',
       render: (lead) => (
         <div className="flex items-center gap-2">
           <img
-            src={lead.assignedTo.avatar}
-            alt={lead.assignedTo.name}
-            className="w-6 h-6 rounded-full object-cover"
+            src={typeof lead.assignedTo === 'object' ? lead.assignedTo.avatar : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150'}
+            alt={typeof lead.assignedTo === 'object' ? lead.assignedTo.name : lead.assignedTo}
+            className="w-6 h-6 rounded-full object-cover ring-2 ring-purple-100"
           />
-          <span className="text-xs text-slate-700 font-medium">{lead.assignedTo.name}</span>
+          <span className="text-xs text-slate-700 font-medium">
+            {typeof lead.assignedTo === 'object' ? lead.assignedTo.name : lead.assignedTo}
+          </span>
         </div>
       ),
+    },
+    {
+      header: 'Pipeline Stage',
+      key: 'stage',
+      render: (lead) => {
+        const stg = PIPELINE_STAGES.find((s) => s.id === lead.stage);
+        return (
+          <Badge dot variant="orange">
+            {stg?.name || lead.stage}
+          </Badge>
+        );
+      },
     },
     {
       header: 'Actions',
@@ -208,39 +238,23 @@ export const LeadsListPage = () => {
           <button
             type="button"
             onClick={() => setSelectedLead(lead)}
-            className="p-1.5 text-slate-500 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+            className="p-1.5 text-slate-400 hover:text-brand-primary hover:bg-purple-50 rounded-lg transition-colors"
             title="View Details"
           >
             <Eye className="w-4 h-4" />
           </button>
           <button
             type="button"
-            onClick={() => setRequirementModal(lead)}
-            className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-            title="Add Requirement"
+            onClick={() => navigate(`/leads/${lead.id}`)}
+            className="p-1.5 text-slate-400 hover:text-purple-700 hover:bg-purple-50 rounded-lg transition-colors"
+            title="Full Page View"
           >
-            <FileText className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setQuotationModal(lead)}
-            className="p-1.5 text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
-            title="Create Quotation"
-          >
-            <FileCheck className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setFollowupModal(lead)}
-            className="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-            title="Add Follow-up"
-          >
-            <Clock className="w-4 h-4" />
+            <ArrowRight className="w-4 h-4" />
           </button>
           <button
             type="button"
             onClick={() => setEditLeadModal(lead)}
-            className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
+            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
             title="Edit Lead"
           >
             <Edit className="w-4 h-4" />
@@ -248,10 +262,10 @@ export const LeadsListPage = () => {
           <button
             type="button"
             onClick={() => setConvertModal(lead)}
-            className="p-1.5 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+            className="p-1.5 text-slate-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
             title="Convert to Opportunity"
           >
-            <TrendingUp className="w-4 h-4" />
+            <User className="w-4 h-4" />
           </button>
         </div>
       ),
@@ -261,109 +275,164 @@ export const LeadsListPage = () => {
   return (
     <PageTransition>
       <PageHeader
-        title="Leads Management"
-        subtitle="Capture, qualify, and convert new inbound business inquiries into active opportunities."
+        title="Leads Pipeline"
+        subtitle="Track inbound prospects, qualification stages, follow-ups, and opportunity conversions."
         breadcrumbs={[{ label: 'Leads' }]}
-        actions={
-          <div className="flex items-center gap-3">
-            {/* View switcher */}
-            <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
-              <button
-                type="button"
-                onClick={() => setViewMode('table')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 ${
-                  viewMode === 'table' ? 'bg-white text-brand-primary shadow-2xs' : 'text-slate-500'
-                }`}
-              >
-                <List className="w-3.5 h-3.5" />
-                Table
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('pipeline')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 ${
-                  viewMode === 'pipeline' ? 'bg-white text-brand-primary shadow-2xs' : 'text-slate-500'
-                }`}
-              >
-                <LayoutGrid className="w-3.5 h-3.5" />
-                Pipeline
-              </button>
-            </div>
-
-            {/* Top-Right Add Lead Button */}
-            <PrimaryButton
-              variant="orange"
-              icon={Plus}
-              onClick={() => setIsAddModalOpen(true)}
-            >
-              Add Lead
-            </PrimaryButton>
-          </div>
+        action={
+          <PrimaryButton variant="orange" icon={Plus} onClick={() => setIsAddModalOpen(true)}>
+            Add New Lead
+          </PrimaryButton>
         }
       />
 
+      {/* Stage KPI Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+        {stageStats.map((stg) => (
+          <Card
+            key={stg.id}
+            hover
+            onClick={() => setStageFilter(stageFilter === stg.id ? 'All' : stg.id)}
+            className={`!p-3.5 border-2 cursor-pointer transition-all ${
+              stageFilter === stg.id
+                ? 'border-brand-primary bg-purple-50/40 shadow-sm'
+                : 'border-slate-100 hover:border-purple-200'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                {stg.name}
+              </span>
+              <span className="w-2 h-2 rounded-full bg-brand-accent" />
+            </div>
+            <div className="flex items-baseline justify-between mt-1">
+              <span className="text-xl font-bold font-heading text-slate-900">{stg.count}</span>
+              <span className="text-xs font-bold text-brand-primary font-sans">
+                {formatCurrency(stg.totalVal)}
+              </span>
+            </div>
+          </Card>
+        ))}
+      </div>
 
-
-      {/* Search & Filter */}
-      <Card className="mb-6 !p-4">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
+      {/* Filters Toolbar */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+        <div className="w-full sm:w-80">
           <SearchBar
             value={searchQuery}
             onChange={setSearchQuery}
-            placeholder="Search by company, contact, or email..."
-            className="max-w-md w-full"
+            placeholder="Search leads by company, contact, or email..."
+          />
+        </div>
+
+        <div className="flex items-center gap-3 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+          <Select
+            value={sourceFilter}
+            onChange={(e) => setSourceFilter(e.target.value)}
+            options={['All', 'Website Form', 'Referral', 'LinkedIn InMail', 'Cold Outreach']}
+            className="w-40 text-xs"
           />
 
-          <div className="flex items-center gap-3 w-full lg:w-auto">
-            <Select
-              value={stageFilter}
-              onChange={(e) => setStageFilter(e.target.value)}
-              options={['All', ...PIPELINE_STAGES.map((s) => s.id)]}
-              className="py-1.5 text-xs"
-            />
+          <div className="flex items-center bg-slate-100 p-1 rounded-xl shrink-0">
+            <button
+              type="button"
+              onClick={() => setViewMode('table')}
+              className={`p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors ${
+                viewMode === 'table'
+                  ? 'bg-white text-slate-900 shadow-xs'
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <List className="w-4 h-4" />
+              <span>Table</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('pipeline')}
+              className={`p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors ${
+                viewMode === 'pipeline'
+                  ? 'bg-white text-slate-900 shadow-xs'
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <LayoutGrid className="w-4 h-4" />
+              <span>Kanban</span>
+            </button>
           </div>
         </div>
-      </Card>
+      </div>
 
-      {/* Table / Pipeline Views */}
+      {/* Content Area */}
       {viewMode === 'table' ? (
-        <Table columns={columns} data={filteredLeads} onRowClick={(lead) => setSelectedLead(lead)} />
+        filteredLeads.length > 0 ? (
+          <Table
+            columns={columns}
+            data={filteredLeads}
+            onRowClick={(lead) => setSelectedLead(lead)}
+          />
+        ) : (
+          <Card>
+            <EmptyState
+              icon={UsersRound}
+              title="No Leads Found"
+              description="No incoming leads match your current search parameters. Clear filters or add a new lead."
+              actionLabel="Add Lead"
+              onAction={() => setIsAddModalOpen(true)}
+            />
+          </Card>
+        )
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 overflow-x-auto pb-4">
-          {PIPELINE_STAGES.map((stage) => {
-            const stageLeads = filteredLeads.filter((l) => l.stage === stage.id);
+        /* Pipeline View */
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 overflow-x-auto pb-4">
+          {PIPELINE_STAGES.map((stg) => {
+            const stageLeads = filteredLeads.filter((l) => l.stage === stg.id);
             return (
-              <div key={stage.id} className="bg-slate-50 p-3 rounded-[20px] border border-slate-200 min-w-[220px]">
-                <div className="flex items-center justify-between pb-2 mb-3 border-b border-slate-200 font-bold text-xs text-slate-800">
-                  <span>{stage.name}</span>
-                  <span className="bg-white px-2 py-0.5 rounded-md text-slate-500">{stageLeads.length}</span>
+              <div key={stg.id} className="bg-slate-100/70 p-3 rounded-[20px] min-w-[240px] flex flex-col gap-3">
+                <div className="flex items-center justify-between px-1">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-brand-primary" />
+                    <h3 className="font-bold text-xs text-slate-800 font-heading">{stg.name}</h3>
+                  </div>
+                  <span className="text-[11px] font-bold px-2 py-0.5 bg-white text-slate-600 rounded-full border border-slate-200">
+                    {stageLeads.length}
+                  </span>
                 </div>
-                <div className="space-y-3">
+
+                <div className="space-y-3 flex-1">
                   {stageLeads.map((lead) => (
-                    <div
+                    <Card
                       key={lead.id}
+                      hover
                       onClick={() => setSelectedLead(lead)}
-                      className="p-3.5 bg-white rounded-[16px] border border-slate-100 shadow-2xs hover:shadow-md cursor-pointer transition-all"
+                      className="!p-3.5 border-slate-200 hover:border-purple-300 transition-all cursor-pointer"
                     >
-                      <h4 className="text-xs font-bold text-slate-900">{lead.name}</h4>
-                      <p className="text-[11px] text-slate-500 mt-0.5">{lead.contact}</p>
-                      <div className="mt-3 pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-                        <span className="font-bold text-brand-primary">{formatCurrency(lead.value)}</span>
-                        <div className="flex items-center gap-1">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setFollowupModal(lead);
-                            }}
-                            className="p-1 hover:bg-amber-50 text-amber-600 rounded"
-                            title="Follow-up"
-                          >
-                            <Clock className="w-3.5 h-3.5" />
-                          </button>
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <h4 className="font-bold text-slate-900 text-xs font-heading group-hover:text-brand-primary">
+                          {lead.name}
+                        </h4>
+                        <span className="text-xs font-bold text-emerald-600 font-sans shrink-0">
+                          {formatCurrency(lead.value)}
+                        </span>
+                      </div>
+
+                      <p className="text-[11px] text-slate-500 font-medium mb-3">
+                        {lead.contact} ({lead.role})
+                      </p>
+
+                      <div className="flex items-center justify-between text-[11px] pt-2.5 border-t border-slate-100 text-slate-400">
+                        <span className="flex items-center gap-1 text-slate-600 font-medium">
+                          <Building2 className="w-3 h-3 text-purple-600" />
+                          {lead.service}
+                        </span>
+                        <div className="flex items-center gap-1 font-semibold text-slate-700">
+                          <img
+                            src={typeof lead.assignedTo === 'object' ? lead.assignedTo.avatar : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150'}
+                            alt="Rep"
+                            className="w-4 h-4 rounded-full"
+                          />
+                          {(typeof lead.assignedTo === 'object' ? lead.assignedTo.name : lead.assignedTo).split(' ')[0]}
                         </div>
                       </div>
-                    </div>
+                    </Card>
                   ))}
                 </div>
               </div>
@@ -372,39 +441,39 @@ export const LeadsListPage = () => {
         </div>
       )}
 
-      {/* RIGHT-SIDE DRAWER: VIEW LEAD DETAILS */}
+      {/* VIEW LEAD DETAILS DRAWER */}
       {selectedLead && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-slate-900/50 backdrop-blur-xs">
-          <div className="w-full max-w-lg bg-white h-full shadow-2xl flex flex-col justify-between overflow-y-auto animate-in slide-in-from-right duration-300">
-            {/* Drawer Header */}
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-10">
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-purple-700 bg-purple-50 px-2 py-0.5 rounded-md">
+        <div className="fixed inset-0 z-50 overflow-hidden bg-slate-900/40 backdrop-blur-xs flex justify-end">
+          <div className="w-full max-w-md bg-white h-full shadow-2xl p-6 overflow-y-auto flex flex-col justify-between animate-in slide-in-from-right duration-200">
+            <div>
+              <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+                <span className="text-xs font-bold uppercase tracking-wider text-purple-700 bg-purple-50 px-2.5 py-1 rounded-lg">
                   Lead Details
                 </span>
-                <h3 className="text-xl font-bold font-heading text-slate-900 mt-1">
-                  {selectedLead.name}
-                </h3>
+                <button
+                  type="button"
+                  onClick={() => setSelectedLead(null)}
+                  className="p-1 text-slate-400 hover:text-slate-600 rounded-lg"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setSelectedLead(null)}
-                className="p-2 text-slate-400 hover:text-slate-700 rounded-xl hover:bg-slate-100"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
 
-            {/* Drawer Content */}
-            <div className="p-6 space-y-6 flex-1">
+              <div className="my-5">
+                <h3 className="text-xl font-bold font-heading text-slate-900">{selectedLead.name}</h3>
+                <p className="text-xs text-slate-400 font-medium mt-0.5">
+                  Registered on {selectedLead.createdDate}
+                </p>
+              </div>
+
               {/* Contact Info */}
-              <div className="p-4 rounded-[18px] bg-slate-50 border border-slate-100 space-y-2">
+              <div className="p-4 rounded-[18px] bg-slate-50 border border-slate-100 space-y-2 mb-4">
                 <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                   Contact Information
                 </h4>
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-slate-500 font-medium">Contact Person:</span>
-                  <span className="font-bold text-slate-800">{selectedLead.contact} ({selectedLead.role})</span>
+                  <span className="font-bold text-slate-800">{selectedLead.contact} ({selectedLead.role || 'Executive'})</span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-slate-500 font-medium">Email:</span>
@@ -416,30 +485,38 @@ export const LeadsListPage = () => {
                 </div>
               </div>
 
-              {/* Company Info */}
-              <div className="p-4 rounded-[18px] bg-slate-50 border border-slate-100 space-y-2">
+              {/* Company Info & Deal Parameters */}
+              <div className="p-4 rounded-[18px] bg-slate-50 border border-slate-100 space-y-2 mb-4">
                 <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                   Deal Parameters
                 </h4>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-slate-500 font-medium">Interested Service:</span>
+                  <span className="font-bold text-brand-primary">{selectedLead.service || 'Software'}</span>
+                </div>
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-slate-500 font-medium">Estimated Value:</span>
                   <span className="font-bold text-emerald-600 text-sm">{formatCurrency(selectedLead.value)}</span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-slate-500 font-medium">Lead Source:</span>
-                  <span className="font-semibold text-slate-700">{selectedLead.source}</span>
+                  <span className="font-semibold text-slate-700">{selectedLead.source || 'Website Form'}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-slate-500 font-medium">Expected Close:</span>
+                  <span className="font-semibold text-slate-700">{selectedLead.expectedClose || '2026-04-30'}</span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-slate-500 font-medium">Assigned Rep:</span>
                   <div className="flex items-center gap-1.5 font-bold text-slate-800">
-                    <img src={selectedLead.assignedTo.avatar} alt="Rep" className="w-5 h-5 rounded-full" />
-                    {selectedLead.assignedTo.name}
+                    <img src={typeof selectedLead.assignedTo === 'object' ? selectedLead.assignedTo.avatar : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150'} alt="Rep" className="w-5 h-5 rounded-full" />
+                    {typeof selectedLead.assignedTo === 'object' ? selectedLead.assignedTo.name : selectedLead.assignedTo}
                   </div>
                 </div>
               </div>
 
               {/* Lead Notes */}
-              <div>
+              <div className="mb-4">
                 <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                   Lead Scope & Notes
                 </h4>
@@ -549,7 +626,7 @@ export const LeadsListPage = () => {
       >
         <form onSubmit={handleAddLead} className="space-y-4">
           <Input
-            label="Company Name"
+            label="Company Name *"
             placeholder="e.g. Acme Innovations"
             value={newLead.name || ''}
             onChange={(e) => setNewLead({ ...newLead, name: e.target.value })}
@@ -557,14 +634,29 @@ export const LeadsListPage = () => {
           />
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="Contact Person"
+              label="Contact Person *"
               placeholder="e.g. Rajeev Malhotra"
               value={newLead.contact || ''}
               onChange={(e) => setNewLead({ ...newLead, contact: e.target.value })}
               required
             />
             <Input
-              label="Phone"
+              label="Role / Designation"
+              placeholder="e.g. VP Technology"
+              value={newLead.role || ''}
+              onChange={(e) => setNewLead({ ...newLead, role: e.target.value })}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="Email Address"
+              type="email"
+              placeholder="e.g. rajeev@acme.com"
+              value={newLead.email || ''}
+              onChange={(e) => setNewLead({ ...newLead, email: e.target.value })}
+            />
+            <Input
+              label="Phone *"
               placeholder="+91 98112 00000"
               value={newLead.phone || ''}
               onChange={(e) => setNewLead({ ...newLead, phone: e.target.value })}
@@ -585,16 +677,30 @@ export const LeadsListPage = () => {
               onChange={(e) => setNewLead({ ...newLead, assignedTo: e.target.value })}
             />
           </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="Deal Budget (₹)"
+              type="number"
+              placeholder="850000"
+              value={newLead.value || ''}
+              onChange={(e) => setNewLead({ ...newLead, value: e.target.value })}
+            />
+            <Select
+              label="Lead Source"
+              options={['Website Form', 'Referral', 'LinkedIn InMail', 'Cold Outreach', 'Partner Network', 'Events']}
+              value={newLead.source || 'Website Form'}
+              onChange={(e) => setNewLead({ ...newLead, source: e.target.value })}
+            />
+          </div>
           <Input
-            label="Deal Budget (₹)"
-            type="number"
-            placeholder="850000"
-            value={newLead.value || ''}
-            onChange={(e) => setNewLead({ ...newLead, value: e.target.value })}
+            label="Expected Close Date"
+            type="date"
+            value={newLead.expectedClose || '2026-04-30'}
+            onChange={(e) => setNewLead({ ...newLead, expectedClose: e.target.value })}
           />
           <TextArea
             label="Notes"
-            placeholder="Key requirements..."
+            placeholder="Key requirements & initial deal notes..."
             value={newLead.notes || ''}
             onChange={(e) => setNewLead({ ...newLead, notes: e.target.value })}
           />
@@ -618,17 +724,68 @@ export const LeadsListPage = () => {
               label="Company Name"
               value={editLeadModal.name || ''}
               onChange={(e) => setEditLeadModal({ ...editLeadModal, name: e.target.value })}
+              required
             />
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                label="Contact Person"
+                value={editLeadModal.contact || ''}
+                onChange={(e) => setEditLeadModal({ ...editLeadModal, contact: e.target.value })}
+                required
+              />
+              <Input
+                label="Role / Designation"
+                value={editLeadModal.role || ''}
+                onChange={(e) => setEditLeadModal({ ...editLeadModal, role: e.target.value })}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                label="Email Address"
+                type="email"
+                value={editLeadModal.email || ''}
+                onChange={(e) => setEditLeadModal({ ...editLeadModal, email: e.target.value })}
+              />
+              <Input
+                label="Phone"
+                value={editLeadModal.phone || ''}
+                onChange={(e) => setEditLeadModal({ ...editLeadModal, phone: e.target.value })}
+                required
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Select
+                label="Interested Service"
+                options={SERVICES}
+                value={editLeadModal.service || SERVICES[0]}
+                onChange={(e) => setEditLeadModal({ ...editLeadModal, service: e.target.value })}
+              />
+              <Select
+                label="Assigned Employee"
+                options={mockEmployees.map((e) => e.name)}
+                value={typeof editLeadModal.assignedTo === 'object' ? editLeadModal.assignedTo.name : (editLeadModal.assignedTo || mockEmployees[0].name)}
+                onChange={(e) => setEditLeadModal({ ...editLeadModal, assignedTo: e.target.value })}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                label="Deal Value (₹)"
+                type="number"
+                value={editLeadModal.value || ''}
+                onChange={(e) => setEditLeadModal({ ...editLeadModal, value: e.target.value })}
+              />
+              <Select
+                label="Lead Source"
+                options={['Website Form', 'Referral', 'LinkedIn InMail', 'Cold Outreach', 'Partner Network', 'Events']}
+                value={editLeadModal.source || 'Website Form'}
+                onChange={(e) => setEditLeadModal({ ...editLeadModal, source: e.target.value })}
+              />
+            </div>
             <Input
-              label="Contact Person"
-              value={editLeadModal.contact || ''}
-              onChange={(e) => setEditLeadModal({ ...editLeadModal, contact: e.target.value })}
-            />
-            <Input
-              label="Deal Value (₹)"
-              type="number"
-              value={editLeadModal.value || ''}
-              onChange={(e) => setEditLeadModal({ ...editLeadModal, value: e.target.value })}
+              label="Expected Close Date"
+              type="date"
+              value={editLeadModal.expectedClose || '2026-04-30'}
+              onChange={(e) => setEditLeadModal({ ...editLeadModal, expectedClose: e.target.value })}
             />
             <TextArea
               label="Notes"

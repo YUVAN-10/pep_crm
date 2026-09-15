@@ -765,29 +765,65 @@ export const OpportunitiesPage = () => {
             className="space-y-4"
           >
             <Input
-              label="Opportunity Name"
+              label="Opportunity Name *"
               value={formData.name || ''}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
             />
             <Input
-              label="Customer Company"
+              label="Customer Company *"
               value={formData.customer || ''}
               onChange={(e) => setFormData({ ...formData, customer: e.target.value })}
               required
             />
-            <Input
-              label="Deal Value (₹)"
-              type="number"
-              value={formData.value || ''}
-              onChange={(e) => setFormData({ ...formData, value: Number(e.target.value) })}
-              required
-            />
-            <Select
-              label="Pipeline Stage"
-              value={formData.stage || 'new'}
-              onChange={(e) => setFormData({ ...formData, stage: e.target.value })}
-              options={OPPORTUNITY_STAGES.map((s) => s.id)}
+            <div className="grid grid-cols-2 gap-4">
+              <Select
+                label="Service Type"
+                options={SERVICES}
+                value={formData.service || SERVICES[0]}
+                onChange={(e) => setFormData({ ...formData, service: e.target.value })}
+              />
+              <Select
+                label="Assigned Employee"
+                options={mockEmployees.map((e) => e.name)}
+                value={formData.assignedTo || mockEmployees[0].name}
+                onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                label="Deal Value (₹) *"
+                type="number"
+                value={formData.value || ''}
+                onChange={(e) => setFormData({ ...formData, value: Number(e.target.value) })}
+                required
+              />
+              <Input
+                label="Win Probability (%)"
+                placeholder="60%"
+                value={formData.probability || '60%'}
+                onChange={(e) => setFormData({ ...formData, probability: e.target.value })}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <Input
+                label="Expected Close Date"
+                type="date"
+                value={formData.expectedClose || '2026-04-30'}
+                onChange={(e) => setFormData({ ...formData, expectedClose: e.target.value })}
+              />
+              <Select
+                label="Pipeline Stage"
+                value={formData.stage || 'new'}
+                onChange={(e) => setFormData({ ...formData, stage: e.target.value })}
+                options={OPPORTUNITY_STAGES.map((s) => s.id)}
+              />
+            </div>
+            <TextArea
+              label="Next Action / Notes"
+              placeholder="e.g. Schedule technical architecture demo..."
+              value={formData.nextAction || ''}
+              onChange={(e) => setFormData({ ...formData, nextAction: e.target.value })}
             />
 
             <div className="flex justify-end gap-3 pt-3">
@@ -796,183 +832,6 @@ export const OpportunitiesPage = () => {
             </div>
           </form>
         </Modal>
-      )}
-
-      {/* VIEW CENTRAL SALES WORKFLOW DETAILS DRAWER */}
-      {selectedOpp && (
-        <div className="fixed inset-0 z-50 overflow-hidden bg-slate-900/40 backdrop-blur-xs flex justify-end">
-          <div className="w-full max-w-lg bg-white h-full shadow-2xl p-6 overflow-y-auto flex flex-col justify-between animate-in slide-in-from-right duration-200">
-            <div>
-              <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-                <span className="text-xs font-bold uppercase tracking-wider text-purple-700 bg-purple-50 px-2.5 py-1 rounded-lg">
-                  {selectedOpp.service}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setSelectedOpp(null)}
-                  className="p-1 text-slate-400 hover:text-slate-600 rounded-lg"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="my-5 space-y-1">
-                <h3 className="text-xl font-bold font-heading text-slate-900">{selectedOpp.name}</h3>
-                <p className="text-sm font-semibold text-slate-500 flex items-center gap-1">
-                  <Building2 className="w-4 h-4 text-slate-400" />
-                  {selectedOpp.customer}
-                </p>
-              </div>
-
-              {/* Stage Transition Control */}
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-purple-50 to-indigo-50/50 border border-purple-100 mb-6">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-purple-700 mb-1.5 block">
-                  Workflow Pipeline Stage
-                </label>
-                <select
-                  value={selectedOpp.stage || 'new'}
-                  onChange={(e) => handleStageChange(selectedOpp, e.target.value)}
-                  className="w-full text-xs font-bold bg-white text-slate-800 border border-purple-200 rounded-xl p-2.5 cursor-pointer shadow-2xs focus:ring-2 focus:ring-purple-400 outline-none"
-                >
-                  {OPPORTUNITY_STAGES.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Deal Metrics Card */}
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-3 mb-6">
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-400 font-semibold">Estimated Deal Value</span>
-                  <span className="text-lg font-bold font-heading text-emerald-600">
-                    {formatCurrency(selectedOpp.value)}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-400 font-semibold">Win Probability</span>
-                  <span className="font-bold text-purple-700">{selectedOpp.probability || '60%'}</span>
-                </div>
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-400 font-semibold">Assigned Executive</span>
-                  <span className="font-semibold text-slate-700">{selectedOpp.assignedTo}</span>
-                </div>
-                <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-400 font-semibold">Expected Close</span>
-                  <span className="font-semibold text-slate-700">{selectedOpp.expectedClose || '2026-04-30'}</span>
-                </div>
-
-                {selectedOpp.stage === 'lost' && selectedOpp.lostReason && (
-                  <div className="pt-2 border-t border-slate-200 text-xs">
-                    <span className="text-rose-600 font-bold block mb-0.5">Lost Reason:</span>
-                    <span className="text-slate-700 font-medium">{selectedOpp.lostReason}</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Central Action Toolbar */}
-              <div className="space-y-2 mb-6">
-                <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px] mb-2">Workflow Actions</h4>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const opp = selectedOpp;
-                      setSelectedOpp(null);
-                      setActionModal({ type: 'requirement', opp });
-                    }}
-                    className="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 text-slate-700 hover:text-blue-700 transition-all text-xs font-semibold"
-                  >
-                    <span className="flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-blue-500" />
-                      Add Requirement
-                    </span>
-                    <ChevronRight className="w-4 h-4 opacity-50" />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const opp = selectedOpp;
-                      setSelectedOpp(null);
-                      setActionModal({ type: 'quotation', opp });
-                    }}
-                    className="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-amber-50 border border-slate-200 hover:border-amber-200 text-slate-700 hover:text-amber-700 transition-all text-xs font-semibold"
-                  >
-                    <span className="flex items-center gap-2">
-                      <FileCheck className="w-4 h-4 text-amber-500" />
-                      Create Quotation
-                    </span>
-                    <ChevronRight className="w-4 h-4 opacity-50" />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const opp = selectedOpp;
-                      setSelectedOpp(null);
-                      setActionModal({ type: 'followup', opp });
-                    }}
-                    className="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 text-slate-700 hover:text-indigo-700 transition-all text-xs font-semibold"
-                  >
-                    <span className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-indigo-500" />
-                      Schedule Follow-up
-                    </span>
-                    <ChevronRight className="w-4 h-4 opacity-50" />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const opp = selectedOpp;
-                      setSelectedOpp(null);
-                      setMarkWonModal(opp);
-                    }}
-                    className="flex items-center justify-between p-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 transition-all text-xs font-semibold"
-                  >
-                    <span className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                      Convert to Project
-                    </span>
-                    <ChevronRight className="w-4 h-4 opacity-50" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Activity Feed */}
-              <div className="space-y-3 text-xs">
-                <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                  <History className="w-4 h-4 text-purple-600" />
-                  Deal History & Activity Log
-                </h4>
-                <div className="space-y-2">
-                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-slate-600 text-xs">
-                    <p className="font-semibold text-slate-800">Current Stage: {selectedOpp.stage}</p>
-                    <p className="text-[11px] text-slate-400 mt-0.5">Last updated today</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-6 border-t border-slate-100 flex items-center justify-between gap-2">
-              <SecondaryButton onClick={() => setSelectedOpp(null)}>Close Drawer</SecondaryButton>
-              {selectedOpp.stage !== 'won' && (
-                <PrimaryButton
-                  variant="orange"
-                  onClick={() => {
-                    const targetOpp = selectedOpp;
-                    setSelectedOpp(null);
-                    setMarkWonModal(targetOpp);
-                  }}
-                >
-                  Mark Won & Convert
-                </PrimaryButton>
-              )}
-            </div>
-          </div>
-        </div>
       )}
 
       {/* Add Opportunity Modal */}
@@ -991,11 +850,11 @@ export const OpportunitiesPage = () => {
               customer: formData.customer || 'Client Company',
               service: formData.service || SERVICES[0],
               value: Number(formData.value) || 1000000,
-              probability: '60%',
-              expectedClose: '2026-04-30',
-              assignedTo: 'Sanjay Verma',
+              probability: formData.probability || '60%',
+              expectedClose: formData.expectedClose || '2026-04-30',
+              assignedTo: formData.assignedTo || mockEmployees[0].name,
               stage: formData.stage || 'new',
-              nextAction: 'Collect requirements',
+              nextAction: formData.nextAction || 'Collect requirements',
             };
             if (crm?.opportunities) {
               crm.opportunities.unshift(newOppObj);
@@ -1008,28 +867,60 @@ export const OpportunitiesPage = () => {
           className="space-y-4"
         >
           <Input
-            label="Opportunity Name"
+            label="Opportunity Name *"
             placeholder="e.g. Enterprise ERP Revamp"
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
           />
           <Input
-            label="Customer Company"
+            label="Customer Company *"
             placeholder="e.g. Acme Corp"
             onChange={(e) => setFormData({ ...formData, customer: e.target.value })}
             required
           />
-          <Select
-            label="Service Type"
-            options={SERVICES}
-            onChange={(e) => setFormData({ ...formData, service: e.target.value })}
-          />
-          <Input
-            label="Estimated Value (₹)"
-            type="number"
-            placeholder="1000000"
-            onChange={(e) => setFormData({ ...formData, value: e.target.value })}
-            required
+          <div className="grid grid-cols-2 gap-4">
+            <Select
+              label="Service Type"
+              options={SERVICES}
+              onChange={(e) => setFormData({ ...formData, service: e.target.value })}
+            />
+            <Select
+              label="Assigned Employee"
+              options={mockEmployees.map((e) => e.name)}
+              onChange={(e) => setFormData({ ...formData, assignedTo: e.target.value })}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="Estimated Value (₹) *"
+              type="number"
+              placeholder="1000000"
+              onChange={(e) => setFormData({ ...formData, value: e.target.value })}
+              required
+            />
+            <Input
+              label="Win Probability (%)"
+              placeholder="60%"
+              onChange={(e) => setFormData({ ...formData, probability: e.target.value })}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Input
+              label="Expected Close Date"
+              type="date"
+              defaultValue="2026-04-30"
+              onChange={(e) => setFormData({ ...formData, expectedClose: e.target.value })}
+            />
+            <Select
+              label="Pipeline Stage"
+              options={OPPORTUNITY_STAGES.map((s) => s.id)}
+              onChange={(e) => setFormData({ ...formData, stage: e.target.value })}
+            />
+          </div>
+          <TextArea
+            label="Next Action / Notes"
+            placeholder="e.g. Schedule technical architecture demo..."
+            onChange={(e) => setFormData({ ...formData, nextAction: e.target.value })}
           />
           <div className="flex justify-end gap-3 pt-3">
             <SecondaryButton onClick={() => setIsAddModalOpen(false)}>Cancel</SecondaryButton>

@@ -396,6 +396,24 @@ export const CRMProvider = ({ children }) => {
     return created;
   };
 
+  const updateLead = (leadId, updatedData) => {
+    setLeads((prev) =>
+      prev.map((l) => {
+        if (l.id === leadId) {
+          return {
+            ...l,
+            ...updatedData,
+            assignedTo: typeof updatedData.assignedTo === 'string'
+              ? { name: updatedData.assignedTo, avatar: l.assignedTo?.avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150' }
+              : (updatedData.assignedTo || l.assignedTo)
+          };
+        }
+        return l;
+      })
+    );
+    logActivity('System', 'updated Lead details', updatedData.name || leadId, 'lead');
+  };
+
   // STEP 2 & 3: Followups
   const addFollowup = (folData) => {
     const fol = {
@@ -560,21 +578,83 @@ export const CRMProvider = ({ children }) => {
   };
 
   const acceptQuotation = (quoteId) => {
+    let targetQuote = null;
     setQuotations((prev) =>
-      prev.map((q) => (q.id === quoteId ? { ...q, status: 'Accepted' } : q))
+      prev.map((q) => {
+        if (q.id === quoteId) {
+          targetQuote = q;
+          return { ...q, status: 'Accepted' };
+        }
+        return q;
+      })
     );
-    logActivity('Sanjay Verma', 'marked Quotation Accepted', 'ABC Hospital', 'quotation');
+    logActivity('Sanjay Verma', 'marked Quotation Accepted', targetQuote?.customer || 'Customer', 'quotation');
     addNotification({
       title: 'Quotation Accepted',
-      description: 'Quotation accepted by ABC Hospital! Ready for Project conversion.',
+      description: `Quotation accepted by ${targetQuote?.customer || 'Customer'}! Ready for Project conversion.`,
       category: 'green',
-      relatedRecord: 'ABC Hospital',
+      relatedRecord: targetQuote?.customer || 'Quotation',
     });
+
+    // Step 7: Automatic Customer Creation on Accepted Quotation
+    const custName = targetQuote?.customer || 'New Client';
+    if (!clients.some((c) => c.company.toLowerCase() === custName.toLowerCase())) {
+      setClients((prev) => [
+        {
+          id: `cli-${Date.now()}`,
+          company: custName,
+          contactPerson: 'Decision Maker',
+          totalSpent: targetQuote?.amount || 1500000,
+          activeProjects: 1,
+          status: 'Active',
+          customerType: 'Converted Customer',
+          joinedDate: new Date().toISOString().split('T')[0],
+          notes: 'Created automatically upon Quotation Acceptance.',
+        },
+        ...prev,
+      ]);
+      logActivity('System', 'created Customer Profile', custName, 'customer');
+      addNotification({
+        title: 'Customer Profile Created',
+        description: `Customer profile created successfully for ${custName}.`,
+        category: 'purple',
+        relatedRecord: custName,
+      });
+    }
+
     markQaPassed('Quotation');
+    markQaPassed('Customer');
   };
 
-  // STEP 9: Convert to Project
+  // STEP 7 & 8: Convert to Project & Auto Customer Creation
   const convertOppToProject = (customerName = 'ABC Hospital', budget = 1500000) => {
+    // Ensure customer profile exists or create automatically
+    let isNewCustomer = false;
+    if (!clients.some((c) => c.company.toLowerCase() === customerName.toLowerCase())) {
+      isNewCustomer = true;
+      setClients((prev) => [
+        {
+          id: `cli-${Date.now()}`,
+          company: customerName,
+          contactPerson: 'Decision Maker',
+          totalSpent: budget,
+          activeProjects: 1,
+          status: 'Active',
+          customerType: 'Converted Customer',
+          joinedDate: new Date().toISOString().split('T')[0],
+          notes: 'Created automatically upon Opportunity Won conversion.',
+        },
+        ...prev,
+      ]);
+      logActivity('System', 'created Customer Profile', customerName, 'customer');
+      addNotification({
+        title: 'Customer Created',
+        description: 'Customer profile created successfully.',
+        category: 'purple',
+        relatedRecord: customerName,
+      });
+    }
+
     const proj = {
       id: `proj-${Date.now()}`,
       title: `${customerName} Software Implementation`,
@@ -584,37 +664,22 @@ export const CRMProvider = ({ children }) => {
       statusLabel: 'In Progress',
       priority: 'high',
       budget: budget,
-      progress: 5,
+      progress: 0, // Starts at 0%
       startDate: new Date().toISOString().split('T')[0],
       deadline: '2026-06-30',
       description: `Custom software implementation built by PEP Software team for ${customerName}.`,
       team: [
         { name: 'Sanjay Verma', role: 'Architect', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100' },
-        { name: 'Pooja Nair', role: 'AI Lead', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100' },
+        { name: 'Pooja Nair', role: 'Project Manager', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100' },
       ],
       milestones: [
         { title: 'Project Kickoff & Specs', status: 'in_progress', date: 'Mar 2026' },
       ],
-      taskStats: { total: 10, completed: 1, inProgress: 2, pending: 7 },
-      tasksCount: 10,
-      completedTasksCount: 1,
+      taskStats: { total: 0, completed: 0, inProgress: 0, pending: 0 },
+      tasksCount: 0,
+      completedTasksCount: 0,
     };
     setProjects((prev) => [proj, ...prev]);
-
-    // Ensure customer profile exists
-    if (!clients.some((c) => c.company === customerName)) {
-      setClients((prev) => [
-        {
-          id: `cli-${Date.now()}`,
-          company: customerName,
-          contactPerson: 'Decision Maker',
-          totalSpent: budget,
-          activeProjects: 1,
-          status: 'Active',
-        },
-        ...prev,
-      ]);
-    }
 
     logActivity('Pooja Nair', 'converted Deal to Active Project', proj.title, 'project');
     addNotification({
@@ -628,11 +693,12 @@ export const CRMProvider = ({ children }) => {
     return proj;
   };
 
-  // STEP 10: Task Management
+  // STEP 9: Task Management
   const addTask = (taskData) => {
+    const targetProjId = taskData.projectId || projects[0]?.id || 'proj-1';
     const t = {
       id: `tsk-${Date.now()}`,
-      projectId: taskData.projectId || projects[0]?.id || 'proj-1',
+      projectId: targetProjId,
       title: taskData.title || 'New Sprint Task',
       columnId: taskData.columnId || 'todo',
       assignedTo: taskData.assignedTo || 'Alice',
@@ -640,6 +706,20 @@ export const CRMProvider = ({ children }) => {
       dueDate: taskData.dueDate || '2026-04-15',
     };
     setTasks((prev) => [t, ...prev]);
+
+    // Recalculate project progress
+    setProjects((pPrev) =>
+      pPrev.map((p) => {
+        if (p.id === targetProjId) {
+          const projTasks = tasks.filter((tk) => tk.projectId === targetProjId).concat(t);
+          const completed = projTasks.filter((tk) => tk.columnId === 'completed').length;
+          const progress = Math.round((completed / (projTasks.length || 1)) * 100);
+          return { ...p, progress, tasksCount: projTasks.length, completedTasksCount: completed };
+        }
+        return p;
+      })
+    );
+
     logActivity(t.assignedTo, 'created Sprint Task', t.title, 'task');
     addNotification({
       title: 'Task Assigned',
@@ -652,17 +732,31 @@ export const CRMProvider = ({ children }) => {
   };
 
   const completeTask = (taskId) => {
+    let targetProjectId = null;
     setTasks((prev) => {
-      const updated = prev.map((t) => (t.id === taskId ? { ...t, columnId: 'completed' } : t));
+      const updated = prev.map((t) => {
+        if (t.id === taskId) {
+          targetProjectId = t.projectId;
+          return { ...t, columnId: 'completed' };
+        }
+        return t;
+      });
       
       // Auto recalculate project progress %
-      const completedCount = updated.filter((t) => t.columnId === 'completed').length;
-      const totalCount = updated.length;
-      const calcProgress = Math.round((completedCount / (totalCount || 1)) * 100);
+      if (targetProjectId) {
+        const projTasks = updated.filter((t) => t.projectId === targetProjectId);
+        const completedCount = projTasks.filter((t) => t.columnId === 'completed').length;
+        const totalCount = projTasks.length;
+        const calcProgress = Math.round((completedCount / (totalCount || 1)) * 100);
 
-      setProjects((pPrev) =>
-        pPrev.map((p) => ({ ...p, progress: calcProgress }))
-      );
+        setProjects((pPrev) =>
+          pPrev.map((p) =>
+            p.id === targetProjectId
+              ? { ...p, progress: calcProgress, completedTasksCount: completedCount }
+              : p
+          )
+        );
+      }
 
       return updated;
     });
@@ -677,7 +771,7 @@ export const CRMProvider = ({ children }) => {
     markQaPassed('Tasks');
   };
 
-  // STEP 11: Payment Test
+  // STEP 10: Payment Test
   const addPayment = (payData) => {
     const inv = {
       id: `inv-${Date.now()}`,
@@ -709,19 +803,46 @@ export const CRMProvider = ({ children }) => {
     markQaPassed('Payments');
   };
 
-  // STEP 12: Project Completion
+  // STEP 11: Project Completion with Strict Validation
   const completeProject = (projectId) => {
-    setProjects((prev) =>
-      prev.map((p) => (p.id === projectId ? { ...p, status: 'completed', progress: 100 } : p))
+    const targetProj = projects.find((p) => p.id === projectId);
+    if (!targetProj) return { success: false, message: 'Project not found' };
+
+    // Validation 1: All tasks for this project must be completed
+    const projTasks = tasks.filter((t) => t.projectId === projectId);
+    const incompleteTasks = projTasks.filter((t) => t.columnId !== 'completed');
+    if (incompleteTasks.length > 0) {
+      return {
+        success: false,
+        message: `Cannot complete project: ${incompleteTasks.length} task(s) are still incomplete. Complete all tasks first.`,
+      };
+    }
+
+    // Validation 2: Pending amount must be ₹0
+    const projInvoices = invoices.filter(
+      (inv) => inv.client.toLowerCase() === targetProj.client.toLowerCase() && inv.status !== 'Paid'
     );
-    logActivity('Pooja Nair', 'marked Project Completed', 'ABC Hospital Portal', 'project');
+    const pendingSum = projInvoices.reduce((sum, i) => sum + i.total, 0);
+    if (pendingSum > 0) {
+      return {
+        success: false,
+        message: `Cannot complete project: Pending payment of ${formatCurrency(pendingSum)} remaining. All invoices must be Paid.`,
+      };
+    }
+
+    // Allowed completion
+    setProjects((prev) =>
+      prev.map((p) => (p.id === projectId ? { ...p, status: 'completed', progress: 100, statusLabel: 'Completed' } : p))
+    );
+    logActivity('Pooja Nair', 'marked Project Completed', targetProj.title, 'project');
     addNotification({
       title: 'Project Completed Successfully',
-      description: 'ABC Hospital Portal project delivered & completed!',
+      description: `${targetProj.title} project delivered & completed!`,
       category: 'emerald',
-      relatedRecord: 'ABC Hospital',
+      relatedRecord: targetProj.client,
     });
     markQaPassed('Project');
+    return { success: true };
   };
 
   // AUTO SIMULATE FULL 12-STEP WORKFLOW
@@ -838,6 +959,7 @@ export const CRMProvider = ({ children }) => {
 
         // Handlers
         addLead,
+        updateLead,
         addFollowup,
         completeFollowup,
         convertLeadToOpportunity,
