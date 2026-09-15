@@ -1,5 +1,7 @@
-<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="50" cy="50" r="50" fill="#35135F" />
-  <path d="M26 66C22 62 21 54 26 44C31 34 42 24 57 24C73 24 84 35 84 50C84 64 73 74 58 74C46 74 38 67 36 57C34 49 39 40 48 38C56 36 64 41 65 48C66 54 62 59 56 59C51 59 47 55 48 50" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
-  <path d="M34 68C31 63 32 55 36 48C40 40 48 34 58 34C68 34 74 41 74 50C74 58 68 64 59 64C51 64 46 59 46 52C46 47 49 43 54 43C58 43 61 46 61 50" stroke="#F59E0B" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="256" cy="256" r="240" fill="#4B1869" />
+  <!-- Outer White Ribbon -->
+  <path d="M 140 305 C 175 250 220 180 270 145 C 330 105 400 140 410 205 C 420 275 350 340 255 340 C 205 340 165 325 145 310" stroke="#FFFFFF" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" />
+  <!-- Inner Gold Ribbon -->
+  <path d="M 175 365 C 210 310 245 255 280 210 C 315 165 360 185 365 220 C 370 255 325 290 265 290 C 230 290 195 282 175 270" stroke="#F5A623" stroke-width="36" stroke-linecap="round" stroke-linejoin="round" />
 </svg>

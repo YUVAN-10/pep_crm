@@ -106,85 +106,75 @@ export const FinanceOverviewPage = () => {
         }
       />
 
-      {/* 4 FINANCIAL KPI CARDS */}
+      {/* 4 ENHANCED FINANCIAL KPI CARDS WITH DISTINCT BORDERS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-        <Card className="!p-5 bg-gradient-to-br from-emerald-50/70 to-white border-emerald-100">
+        {/* Received Amount Card */}
+        <Card className="!p-5 bg-gradient-to-br from-emerald-50/60 via-emerald-50/20 to-white border-2 border-emerald-300/90 shadow-2xs hover:shadow-md hover:border-emerald-400 transition-all duration-200">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wider">
-              Received Amount
+            <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wider">
+              RECEIVED AMOUNT
             </span>
-            <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
               <CheckCircle2 className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-bold font-heading text-slate-900 mt-2">{formatCurrency(totalReceived)}</p>
-          <span className="text-[11px] text-emerald-700 font-medium">Cleared in bank account</span>
+          <p className="text-2xl font-extrabold font-heading text-slate-900 mt-2.5 tracking-tight">
+            {formatCurrency(totalReceived)}
+          </p>
+          <span className="text-[11px] text-emerald-700 font-semibold mt-1 block">Cleared in bank account</span>
         </Card>
 
-        <Card className="!p-5 bg-gradient-to-br from-blue-50/70 to-white border-blue-100">
+        {/* Pending Amount Card */}
+        <Card className="!p-5 bg-gradient-to-br from-blue-50/60 via-blue-50/20 to-white border-2 border-blue-300/90 shadow-2xs hover:shadow-md hover:border-blue-400 transition-all duration-200">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-blue-800 uppercase tracking-wider">
-              Pending Amount
+            <span className="text-[11px] font-bold text-blue-800 uppercase tracking-wider">
+              PENDING AMOUNT
             </span>
-            <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
               <Clock className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-bold font-heading text-slate-900 mt-2">{formatCurrency(totalPending)}</p>
-          <span className="text-[11px] text-blue-700 font-medium">Awaiting payment processing</span>
+          <p className="text-2xl font-extrabold font-heading text-slate-900 mt-2.5 tracking-tight">
+            {formatCurrency(totalPending)}
+          </p>
+          <span className="text-[11px] text-blue-700 font-semibold mt-1 block">Awaiting payment processing</span>
         </Card>
 
-        <Card className="!p-5 bg-gradient-to-br from-rose-50/70 to-white border-rose-100">
+        {/* Overdue Amount Card */}
+        <Card className="!p-5 bg-gradient-to-br from-rose-50/60 via-rose-50/20 to-white border-2 border-rose-300/90 shadow-2xs hover:shadow-md hover:border-rose-400 transition-all duration-200">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-rose-800 uppercase tracking-wider">
-              Overdue Amount
+            <span className="text-[11px] font-bold text-rose-800 uppercase tracking-wider">
+              OVERDUE AMOUNT
             </span>
-            <div className="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
               <AlertTriangle className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-bold font-heading text-slate-900 mt-2">{formatCurrency(totalOverdue)}</p>
-          <span className="text-[11px] text-rose-700 font-medium">Overdue client receivables</span>
+          <p className="text-2xl font-extrabold font-heading text-slate-900 mt-2.5 tracking-tight">
+            {formatCurrency(totalOverdue)}
+          </p>
+          <span className="text-[11px] text-rose-700 font-semibold mt-1 block">Overdue client receivables</span>
         </Card>
 
-        <Card className="!p-5 bg-gradient-to-br from-amber-50/70 to-white border-amber-100">
+        {/* Due Soon Amount Card */}
+        <Card className="!p-5 bg-gradient-to-br from-amber-50/60 via-amber-50/20 to-white border-2 border-amber-300/90 shadow-2xs hover:shadow-md hover:border-amber-400 transition-all duration-200">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-amber-800 uppercase tracking-wider">
-              Due Soon Amount
+            <span className="text-[11px] font-bold text-amber-800 uppercase tracking-wider">
+              DUE SOON AMOUNT
             </span>
-            <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
               <CreditCard className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-bold font-heading text-slate-900 mt-2">{formatCurrency(totalDueSoon)}</p>
-          <span className="text-[11px] text-amber-700 font-medium">Milestones due in next 14 days</span>
+          <p className="text-2xl font-extrabold font-heading text-slate-900 mt-2.5 tracking-tight">
+            {formatCurrency(totalDueSoon)}
+          </p>
+          <span className="text-[11px] text-amber-700 font-semibold mt-1 block">Milestones due in next 14 days</span>
         </Card>
       </div>
 
-      {/* PROJECT PAYMENT MILESTONE TIMELINE */}
-      <Card className="mb-6">
-        <h3 className="text-base font-bold font-heading text-slate-900 mb-4">Project Milestone Payment Timelines</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-          {[
-            { stage: 'Advance Payment', status: 'Paid', amount: '25% (₹7,00,000)', date: 'Nov 2025' },
-            { stage: 'UI Approval', status: 'Paid', amount: '25% (₹7,00,000)', date: 'Dec 2025' },
-            { stage: 'Beta Release', status: 'Pending', amount: '25% (₹7,00,000)', date: 'Mar 2026' },
-            { stage: 'Final Delivery', status: 'Upcoming', amount: '25% (₹7,00,000)', date: 'Apr 2026' },
-          ].map((milestone, idx) => (
-            <div key={idx} className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-xs font-bold text-slate-800">{milestone.stage}</span>
-                <Badge variant={milestone.status === 'Paid' ? 'success' : 'warning'}>{milestone.status}</Badge>
-              </div>
-              <p className="text-xs font-bold text-brand-primary">{milestone.amount}</p>
-              <span className="text-[10px] text-slate-400 mt-1 block">Due: {milestone.date}</span>
-            </div>
-          ))}
-        </div>
-      </Card>
-
       {/* INVOICE TABLE WITH ACTION BUTTONS */}
-      <Card className="mb-6 !p-4">
+      <Card className="mb-6 !p-5 border border-slate-200/90">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-4">
           <SearchBar value={searchQuery} onChange={setSearchQuery} placeholder="Search payments by client or invoice..." className="max-w-md w-full" />
           <Select
@@ -209,7 +199,7 @@ export const FinanceOverviewPage = () => {
             </thead>
             <tbody className="divide-y divide-slate-100 font-medium">
               {filteredInvoices.map((inv) => (
-                <tr key={inv.id} className="hover:bg-slate-50">
+                <tr key={inv.id} className="hover:bg-slate-50/70 transition-colors">
                   <td className="p-3 font-bold text-brand-primary font-mono">{inv.invoiceNumber}</td>
                   <td className="p-3">
                     <span className="font-bold text-slate-900 block">{inv.client}</span>
@@ -229,7 +219,7 @@ export const FinanceOverviewPage = () => {
                         <button
                           type="button"
                           onClick={() => handleMarkPaid(inv)}
-                          className="px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800 font-bold text-[11px] flex items-center gap-1"
+                          className="px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800 font-bold text-[11px] flex items-center gap-1 hover:bg-emerald-200 transition-colors"
                         >
                           <Check className="w-3 h-3" /> Mark Paid
                         </button>
@@ -240,7 +230,7 @@ export const FinanceOverviewPage = () => {
                         <button
                           type="button"
                           onClick={() => handleSendReminder(inv)}
-                          className="px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 font-bold text-[11px] flex items-center gap-1"
+                          className="px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 font-bold text-[11px] flex items-center gap-1 hover:bg-amber-200 transition-colors"
                         >
                           <Bell className="w-3 h-3" /> Payment Reminder
                         </button>
@@ -251,7 +241,7 @@ export const FinanceOverviewPage = () => {
                         href="https://invoice.zoho.com"
                         target="_blank"
                         rel="noreferrer"
-                        className="px-2.5 py-1 rounded-md bg-purple-50 text-brand-primary font-semibold text-[11px] flex items-center gap-1"
+                        className="px-2.5 py-1 rounded-md bg-purple-50 text-brand-primary font-semibold text-[11px] flex items-center gap-1 hover:bg-purple-100 transition-colors"
                       >
                         <ExternalLink className="w-3 h-3" /> Zoho Invoice
                       </a>
@@ -312,3 +302,4 @@ export const FinanceOverviewPage = () => {
 };
 
 export default FinanceOverviewPage;
+
