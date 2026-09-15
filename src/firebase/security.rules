@@ -1,0 +1,76 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Master Owner Access Check
+    function isOwner() {
+      return request.auth != null && request.auth.token.role == 'owner';
+    }
+
+    // Sales Role Access Check
+    function isSales() {
+      return request.auth != null && (request.auth.token.role == 'owner' || request.auth.token.role == 'sales');
+    }
+
+    // Authenticated Employee Check
+    function isEmployee() {
+      return request.auth != null;
+    }
+
+    // Default security rules for PEP CRM Collections
+    match /users/{userId} {
+      allow read: if isEmployee();
+      allow write: if isOwner();
+    }
+
+    match /leads/{leadId} {
+      allow read, write: if isSales();
+    }
+
+    match /opportunities/{opportunityId} {
+      allow read, write: if isSales();
+    }
+
+    match /followups/{followupId} {
+      allow read, write: if isEmployee();
+    }
+
+    match /customers/{customerId} {
+      allow read: if isEmployee();
+      allow write: if isSales();
+    }
+
+    match /requirements/{requirementId} {
+      allow read, write: if isSales();
+    }
+
+    match /quotations/{quotationId} {
+      allow read, write: if isSales();
+    }
+
+    match /projects/{projectId} {
+      allow read, write: if isEmployee();
+    }
+
+    match /tasks/{taskId} {
+      allow read, write: if isEmployee();
+    }
+
+    match /payments/{paymentId} {
+      allow read, write: if isOwner() || isSales();
+    }
+
+    match /activity_logs/{logId} {
+      allow read, create: if isEmployee();
+    }
+
+    match /external_links/{linkId} {
+      allow read, write: if isEmployee();
+    }
+
+    match /settings/{settingId} {
+      allow read: if isEmployee();
+      allow write: if isOwner();
+    }
+  }
+}
