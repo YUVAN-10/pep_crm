@@ -1,4 +1,5 @@
 import React from 'react';
+import { User } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
 export const Avatar = ({
@@ -16,6 +17,14 @@ export const Avatar = ({
     xl: 'w-16 h-16 text-lg',
   };
 
+  const iconSizes = {
+    xs: 'w-3.5 h-3.5',
+    sm: 'w-4 h-4',
+    md: 'w-5 h-5',
+    lg: 'w-6 h-6',
+    xl: 'w-8 h-8',
+  };
+
   const statusSizeClasses = {
     xs: 'w-1.5 h-1.5 ring-1',
     sm: 'w-2 h-2 ring-1.5',
@@ -30,40 +39,16 @@ export const Avatar = ({
     offline: 'bg-slate-400',
   };
 
-  const getInitials = (str) => {
-    if (!str) return 'U';
-    const parts = str.trim().split(' ');
-    if (parts.length >= 2) {
-      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-    }
-    return str.substring(0, 2).toUpperCase();
-  };
-
   return (
     <div className={cn('relative inline-flex shrink-0 select-none', className)}>
-      {src ? (
-        <img
-          src={src}
-          alt={name}
-          className={cn(
-            'rounded-full object-cover border border-slate-200/80 shadow-2xs',
-            sizeClasses[size]
-          )}
-          onError={(e) => {
-            // fallback to initials on broken image
-            e.target.style.display = 'none';
-          }}
-        />
-      ) : (
-        <div
-          className={cn(
-            'rounded-full bg-gradient-to-tr from-brand-primary to-brand-deep text-white font-bold flex items-center justify-center border border-purple-300 shadow-2xs',
-            sizeClasses[size]
-          )}
-        >
-          {getInitials(name)}
-        </div>
-      )}
+      <div
+        className={cn(
+          'rounded-full bg-purple-100 text-brand-primary font-bold flex items-center justify-center border border-purple-200 shadow-2xs',
+          sizeClasses[size]
+        )}
+      >
+        <User className={iconSizes[size] || 'w-5 h-5'} />
+      </div>
 
       {status && (
         <span

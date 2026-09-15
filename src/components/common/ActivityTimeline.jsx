@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useCRM } from '../../context/CRMContext';
 import {
+  User,
   UsersRound,
   Clock,
   CheckCircle2,
@@ -61,11 +62,9 @@ export const ActivityTimeline = ({ activities: propActivities }) => {
             <div className="flex-1 bg-white p-4 rounded-[18px] border border-slate-200/80 shadow-2xs">
               <div className="flex items-center justify-between gap-2 mb-1">
                 <div className="flex items-center gap-2">
-                  <img
-                    src={act.avatar}
-                    alt={act.user}
-                    className="w-5 h-5 rounded-full object-cover ring-1 ring-slate-200"
-                  />
+                  <div className="w-5 h-5 rounded-full bg-purple-100 text-brand-primary flex items-center justify-center shrink-0 ring-1 ring-slate-200">
+                    <User className="w-3 h-3" />
+                  </div>
                   <span className="text-xs font-bold text-slate-900">{act.user}</span>
                   <span className="text-[10px] text-slate-400 font-medium">({act.role || 'Team Member'})</span>
                 </div>

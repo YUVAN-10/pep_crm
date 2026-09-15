@@ -207,11 +207,9 @@ export const LeadsListPage = () => {
       key: 'assignedTo',
       render: (lead) => (
         <div className="flex items-center gap-2">
-          <img
-            src={typeof lead.assignedTo === 'object' ? lead.assignedTo.avatar : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150'}
-            alt={typeof lead.assignedTo === 'object' ? lead.assignedTo.name : lead.assignedTo}
-            className="w-6 h-6 rounded-full object-cover ring-2 ring-purple-100"
-          />
+          <div className="w-6 h-6 rounded-full bg-purple-100 text-brand-primary flex items-center justify-center shrink-0 ring-1 ring-purple-100">
+            <User className="w-3.5 h-3.5" />
+          </div>
           <span className="text-xs text-slate-700 font-medium">
             {typeof lead.assignedTo === 'object' ? lead.assignedTo.name : lead.assignedTo}
           </span>
@@ -424,11 +422,9 @@ export const LeadsListPage = () => {
                           {lead.service}
                         </span>
                         <div className="flex items-center gap-1 font-semibold text-slate-700">
-                          <img
-                            src={typeof lead.assignedTo === 'object' ? lead.assignedTo.avatar : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150'}
-                            alt="Rep"
-                            className="w-4 h-4 rounded-full"
-                          />
+                          <div className="w-4 h-4 rounded-full bg-purple-100 text-brand-primary flex items-center justify-center shrink-0">
+                            <User className="w-2.5 h-2.5" />
+                          </div>
                           {(typeof lead.assignedTo === 'object' ? lead.assignedTo.name : lead.assignedTo).split(' ')[0]}
                         </div>
                       </div>
@@ -509,7 +505,9 @@ export const LeadsListPage = () => {
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-slate-500 font-medium">Assigned Rep:</span>
                   <div className="flex items-center gap-1.5 font-bold text-slate-800">
-                    <img src={typeof selectedLead.assignedTo === 'object' ? selectedLead.assignedTo.avatar : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150'} alt="Rep" className="w-5 h-5 rounded-full" />
+                    <div className="w-5 h-5 rounded-full bg-purple-100 text-brand-primary flex items-center justify-center shrink-0">
+                      <User className="w-3 h-3" />
+                    </div>
                     {typeof selectedLead.assignedTo === 'object' ? selectedLead.assignedTo.name : selectedLead.assignedTo}
                   </div>
                 </div>

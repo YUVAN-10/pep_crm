@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PageTransition from '../../components/common/PageTransition';
 import PageHeader from '../../components/layout/PageHeader';
@@ -6,11 +6,16 @@ import Card from '../../components/cards/Card';
 import Badge from '../../components/common/Badge';
 import OutlineButton from '../../components/buttons/OutlineButton';
 import PrimaryButton from '../../components/buttons/PrimaryButton';
+import SecondaryButton from '../../components/buttons/SecondaryButton';
+import Modal from '../../components/modal/Modal';
+import Input from '../../components/forms/Input';
+import Select from '../../components/forms/Select';
 import { mockEmployees, mockProjects, mockTasks } from '../../utils/mockData';
 import { formatDate } from '../../utils/formatters';
 import { useNotifications } from '../../context/NotificationContext';
 import {
   ArrowLeft,
+  User,
   Mail,
   Phone,
   MapPin,
@@ -21,6 +26,7 @@ import {
   Star,
   Activity,
   Briefcase,
+  UserCog,
 } from 'lucide-react';
 
 export const EmployeeDetailsPage = () => {
@@ -28,10 +34,35 @@ export const EmployeeDetailsPage = () => {
   const navigate = useNavigate();
   const { showSuccess, showInfo } = useNotifications();
 
-  const employee = mockEmployees.find((e) => e.id === id) || mockEmployees[0];
+  const initialEmp = mockEmployees.find((e) => e.id === id) || mockEmployees[0];
+  const [employee, setEmployee] = useState(initialEmp);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editEmpForm, setEditEmpForm] = useState({
+    ...initialEmp,
+    skills: Array.isArray(initialEmp.skills) ? initialEmp.skills.join(', ') : initialEmp.skills,
+  });
+
   const assignedProjects = mockProjects.filter((p) =>
     p.team.some((t) => t.name.includes(employee.name.split(' ')[0]))
   );
+
+  const departments = ['Artificial Intelligence', 'Web & Cloud', 'Mobile Engineering', 'Design & Experience', 'Finance & Operations', 'Executive / Leadership'];
+
+  const handleSaveEditEmployee = (e) => {
+    e.preventDefault();
+    const skillsArr = typeof editEmpForm.skills === 'string'
+      ? editEmpForm.skills.split(',').map((s) => s.trim()).filter(Boolean)
+      : editEmpForm.skills;
+
+    const updated = {
+      ...employee,
+      ...editEmpForm,
+      skills: skillsArr,
+    };
+    setEmployee(updated);
+    setIsEditModalOpen(false);
+    showSuccess(`Updated profile for ${updated.name}!`);
+  };
 
   return (
     <PageTransition>
@@ -47,6 +78,19 @@ export const EmployeeDetailsPage = () => {
             <OutlineButton icon={ArrowLeft} size="sm" onClick={() => navigate('/employees')}>
               Back to Team
             </OutlineButton>
+            <SecondaryButton
+              size="sm"
+              icon={UserCog}
+              onClick={() => {
+                setEditEmpForm({
+                  ...employee,
+                  skills: Array.isArray(employee.skills) ? employee.skills.join(', ') : employee.skills,
+                });
+                setIsEditModalOpen(true);
+              }}
+            >
+              Edit Profile
+            </SecondaryButton>
             <PrimaryButton
               variant="orange"
               size="sm"
@@ -63,11 +107,9 @@ export const EmployeeDetailsPage = () => {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="flex items-center gap-5">
             <div className="relative">
-              <img
-                src={employee.avatar}
-                alt={employee.name}
-                className="w-20 h-20 rounded-[22px] object-cover ring-4 ring-purple-100 shadow-md"
-              />
+              <div className="w-20 h-20 rounded-[22px] bg-purple-100 text-brand-primary flex items-center justify-center ring-4 ring-purple-100 shadow-md">
+                <User className="w-10 h-10" />
+              </div>
               <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 ring-2 ring-white" />
             </div>
 
@@ -174,6 +216,88 @@ export const EmployeeDetailsPage = () => {
           </Card>
         </div>
       </div>
+
+      {/* Edit Employee Modal */}
+      {isEditModalOpen && (
+        <Modal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          title={`Edit Profile — ${employee.name}`}
+          subtitle="Update employee details and skillset."
+          footer={
+            <>
+              <SecondaryButton onClick={() => setIsEditModalOpen(false)}>Cancel</SecondaryButton>
+              <PrimaryButton onClick={handleSaveEditEmployee} variant="purple">
+                Update Profile
+              </PrimaryButton>
+            </>
+          }
+        >
+          <form onSubmit={handleSaveEditEmployee} className="space-y-4">
+            <Input
+              label="Full Name *"
+              value={editEmpForm.name || ''}
+              onChange={(e) => setEditEmpForm({ ...editEmpForm, name: e.target.value })}
+              required
+            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Designation / Role *"
+                value={editEmpForm.role || ''}
+                onChange={(e) => setEditEmpForm({ ...editEmpForm, role: e.target.value })}
+                required
+              />
+              <Select
+                label="Department *"
+                options={departments}
+                value={editEmpForm.department || departments[0]}
+                onChange={(e) => setEditEmpForm({ ...editEmpForm, department: e.target.value })}
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Work Email *"
+                type="email"
+                value={editEmpForm.email || ''}
+                onChange={(e) => setEditEmpForm({ ...editEmpForm, email: e.target.value })}
+                required
+              />
+              <Input
+                label="Phone Number *"
+                value={editEmpForm.phone || ''}
+                onChange={(e) => setEditEmpForm({ ...editEmpForm, phone: e.target.value })}
+                required
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Select
+                label="Base Office Location *"
+                options={['Mumbai Office', 'Bengaluru Office', 'Pune Office', 'Remote']}
+                value={editEmpForm.location || 'Mumbai Office'}
+                onChange={(e) => setEditEmpForm({ ...editEmpForm, location: e.target.value })}
+              />
+              <Select
+                label="Employment Status"
+                options={['Active', 'On Leave', 'Inactive']}
+                value={editEmpForm.status || 'Active'}
+                onChange={(e) => setEditEmpForm({ ...editEmpForm, status: e.target.value })}
+              />
+            </div>
+            <Input
+              label="Joining Date"
+              type="date"
+              value={editEmpForm.joinDate || '2022-01-01'}
+              onChange={(e) => setEditEmpForm({ ...editEmpForm, joinDate: e.target.value })}
+            />
+            <Input
+              label="Core Skills (comma-separated)"
+              placeholder="e.g. React, Node.js, Python, AWS"
+              value={editEmpForm.skills || ''}
+              onChange={(e) => setEditEmpForm({ ...editEmpForm, skills: e.target.value })}
+            />
+          </form>
+        </Modal>
+      )}
     </PageTransition>
   );
 };

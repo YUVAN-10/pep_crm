@@ -19,6 +19,7 @@ import { useNotifications } from '../../context/NotificationContext';
 import { useCRM } from '../../context/CRMContext';
 import {
   ArrowLeft,
+  User,
   DollarSign,
   Mail,
   Phone,
@@ -250,11 +251,9 @@ export const LeadDetailsPage = () => {
               Assigned Sales Representative
             </h4>
             <div className="flex items-center gap-3 p-3 bg-purple-50/50 rounded-[16px] border border-purple-100">
-              <img
-                src={typeof lead.assignedTo === 'object' ? lead.assignedTo.avatar : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150'}
-                alt={typeof lead.assignedTo === 'object' ? lead.assignedTo.name : lead.assignedTo}
-                className="w-12 h-12 rounded-full object-cover ring-2 ring-brand-accent/50"
-              />
+              <div className="w-12 h-12 rounded-full bg-purple-100 text-brand-primary flex items-center justify-center shrink-0 ring-2 ring-brand-accent/50">
+                <User className="w-6 h-6" />
+              </div>
               <div>
                 <p className="font-bold text-slate-900 text-sm">
                   {typeof lead.assignedTo === 'object' ? lead.assignedTo.name : lead.assignedTo}

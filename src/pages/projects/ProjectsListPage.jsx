@@ -19,6 +19,7 @@ import { formatCurrency, formatDate } from '../../utils/formatters';
 import { useNotifications } from '../../context/NotificationContext';
 import {
   Plus,
+  User,
   FolderKanban,
   LayoutGrid,
   List,
@@ -126,13 +127,13 @@ export const ProjectsListPage = () => {
       render: (proj) => (
         <div className="flex -space-x-2">
           {proj.team.map((member, i) => (
-            <img
+            <div
               key={i}
-              src={member.avatar}
-              alt={member.name}
               title={member.name}
-              className="w-6 h-6 rounded-full object-cover ring-2 ring-white"
-            />
+              className="w-6 h-6 rounded-full bg-purple-100 text-brand-primary flex items-center justify-center ring-2 ring-white"
+            >
+              <User className="w-3.5 h-3.5" />
+            </div>
           ))}
         </div>
       ),
@@ -300,13 +301,13 @@ export const ProjectsListPage = () => {
                 <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
                   <div className="flex items-center -space-x-2">
                     {proj.team.map((m, i) => (
-                      <img
+                      <div
                         key={i}
-                        src={m.avatar}
-                        alt={m.name}
                         title={`${m.name} (${m.role})`}
-                        className="w-7 h-7 rounded-full object-cover ring-2 ring-white"
-                      />
+                        className="w-7 h-7 rounded-full bg-purple-100 text-brand-primary flex items-center justify-center ring-2 ring-white"
+                      >
+                        <User className="w-4 h-4" />
+                      </div>
                     ))}
                   </div>
 

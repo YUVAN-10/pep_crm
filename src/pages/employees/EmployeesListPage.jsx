@@ -15,6 +15,7 @@ import { mockEmployees } from '../../utils/mockData';
 import { useNotifications } from '../../context/NotificationContext';
 import {
   Plus,
+  User,
   UserCog,
   Mail,
   Phone,
@@ -49,8 +50,14 @@ export const EmployeesListPage = () => {
     });
   }, [employees, searchQuery, departmentFilter]);
 
+  const [editEmpModal, setEditEmpModal] = useState(null);
+
   const handleAddEmployee = (e) => {
     e.preventDefault();
+    const skillsArr = typeof newEmp.skills === 'string'
+      ? newEmp.skills.split(',').map((s) => s.trim()).filter(Boolean)
+      : (newEmp.skills || ['React', 'Node.js', 'PostgreSQL']);
+
     const created = {
       id: `emp-${Date.now()}`,
       name: newEmp.name || 'New Engineer',
@@ -59,10 +66,10 @@ export const EmployeesListPage = () => {
       email: newEmp.email || 'engineer@pepsoftwares.com',
       phone: newEmp.phone || '+91 99000 11111',
       avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200',
-      status: 'Active',
-      joinDate: new Date().toISOString().split('T')[0],
+      status: newEmp.status || 'Active',
+      joinDate: newEmp.joinDate || new Date().toISOString().split('T')[0],
       location: newEmp.location || 'Mumbai Office',
-      skills: ['React', 'Node.js', 'PostgreSQL'],
+      skills: skillsArr.length > 0 ? skillsArr : ['Software Engineering', 'Problem Solving'],
       activeProjects: 1,
       completedTasks: 0,
       rating: '5.0/5.0',
@@ -73,6 +80,20 @@ export const EmployeesListPage = () => {
     setIsAddModalOpen(false);
     setNewEmp({});
     showSuccess(`Employee ${created.name} onboarded successfully!`);
+  };
+
+  const handleSaveEditEmployee = (e) => {
+    e.preventDefault();
+    if (!editEmpModal) return;
+    const skillsArr = typeof editEmpModal.skills === 'string'
+      ? editEmpModal.skills.split(',').map((s) => s.trim()).filter(Boolean)
+      : editEmpModal.skills;
+
+    setEmployees((prev) =>
+      prev.map((emp) => (emp.id === editEmpModal.id ? { ...editEmpModal, skills: skillsArr } : emp))
+    );
+    setEditEmpModal(null);
+    showSuccess(`Employee ${editEmpModal.name} profile updated successfully!`);
   };
 
   return (
@@ -133,14 +154,28 @@ export const EmployeesListPage = () => {
                 {/* Top Avatar & Status */}
                 <div className="flex items-start justify-between mb-3">
                   <div className="relative">
-                    <img
-                      src={emp.avatar}
-                      alt={emp.name}
-                      className="w-14 h-14 rounded-[18px] object-cover ring-2 ring-purple-100 shadow-sm"
-                    />
-                    <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-2 ring-white" />
+                    <div className="w-14 h-14 rounded-[18px] bg-purple-100 text-brand-primary flex items-center justify-center ring-2 ring-purple-100 shadow-sm">
+                      <User className="w-7 h-7" />
+                    </div>
+                    <span className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full ring-2 ring-white ${emp.status === 'Active' ? 'bg-emerald-500' : 'bg-amber-500'}`} />
                   </div>
-                  <Badge variant="purple">{emp.department}</Badge>
+                  <div className="flex items-center gap-1.5">
+                    <Badge variant="purple">{emp.department}</Badge>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditEmpModal({
+                          ...emp,
+                          skills: Array.isArray(emp.skills) ? emp.skills.join(', ') : emp.skills,
+                        });
+                      }}
+                      className="p-1 text-slate-400 hover:text-brand-primary hover:bg-purple-50 rounded-lg transition-colors"
+                      title="Edit Profile"
+                    >
+                      <UserCog className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
 
                 <h3 className="text-base font-bold font-heading text-slate-900 group-hover:text-brand-primary transition-colors">
@@ -162,21 +197,25 @@ export const EmployeesListPage = () => {
                     <MapPin className="w-3.5 h-3.5 text-slate-400" />
                     <span>{emp.location}</span>
                   </p>
+                  <p className="flex items-center gap-2 text-slate-400 text-[11px]">
+                    <Briefcase className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Joined: {emp.joinDate || '2022-01-01'} • Status: <strong className="text-slate-700">{emp.status}</strong></span>
+                  </p>
                 </div>
 
                 {/* Skills tags */}
                 <div className="mt-3 flex flex-wrap gap-1.5">
-                  {emp.skills.slice(0, 3).map((skill, idx) => (
+                  {(Array.isArray(emp.skills) ? emp.skills : (emp.skills || '').split(',')).slice(0, 3).map((skill, idx) => (
                     <span
                       key={idx}
                       className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600"
                     >
-                      {skill}
+                      {typeof skill === 'string' ? skill.trim() : skill}
                     </span>
                   ))}
-                  {emp.skills.length > 3 && (
+                  {(Array.isArray(emp.skills) ? emp.skills : (emp.skills || '').split(',')).length > 3 && (
                     <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-purple-50 text-brand-primary">
-                      +{emp.skills.length - 3}
+                      +{(Array.isArray(emp.skills) ? emp.skills : (emp.skills || '').split(',')).length - 3}
                     </span>
                   )}
                 </div>
@@ -225,7 +264,7 @@ export const EmployeesListPage = () => {
       >
         <form onSubmit={handleAddEmployee} className="space-y-4">
           <Input
-            label="Full Name"
+            label="Full Name *"
             placeholder="e.g. Aditi Sharma"
             value={newEmp.name || ''}
             onChange={(e) => setNewEmp({ ...newEmp, name: e.target.value })}
@@ -233,14 +272,14 @@ export const EmployeesListPage = () => {
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
-              label="Designation / Role"
+              label="Designation / Role *"
               placeholder="e.g. Senior Frontend Engineer"
               value={newEmp.role || ''}
               onChange={(e) => setNewEmp({ ...newEmp, role: e.target.value })}
               required
             />
             <Select
-              label="Department"
+              label="Department *"
               options={departments.filter((d) => d !== 'All')}
               value={newEmp.department || 'Web & Cloud'}
               onChange={(e) => setNewEmp({ ...newEmp, department: e.target.value })}
@@ -248,7 +287,7 @@ export const EmployeesListPage = () => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
-              label="Work Email"
+              label="Work Email *"
               type="email"
               placeholder="aditi@pepsoftwares.com"
               value={newEmp.email || ''}
@@ -256,20 +295,123 @@ export const EmployeesListPage = () => {
               required
             />
             <Input
-              label="Phone Number"
+              label="Phone Number *"
               placeholder="+91 98201 00000"
               value={newEmp.phone || ''}
               onChange={(e) => setNewEmp({ ...newEmp, phone: e.target.value })}
+              required
             />
           </div>
-          <Select
-            label="Base Office Location"
-            options={['Mumbai Office', 'Bengaluru Office', 'Pune Office', 'Remote']}
-            value={newEmp.location || 'Mumbai Office'}
-            onChange={(e) => setNewEmp({ ...newEmp, location: e.target.value })}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Select
+              label="Base Office Location *"
+              options={['Mumbai Office', 'Bengaluru Office', 'Pune Office', 'Remote']}
+              value={newEmp.location || 'Mumbai Office'}
+              onChange={(e) => setNewEmp({ ...newEmp, location: e.target.value })}
+            />
+            <Select
+              label="Employment Status"
+              options={['Active', 'On Leave', 'Inactive']}
+              value={newEmp.status || 'Active'}
+              onChange={(e) => setNewEmp({ ...newEmp, status: e.target.value })}
+            />
+          </div>
+          <Input
+            label="Joining Date"
+            type="date"
+            value={newEmp.joinDate || new Date().toISOString().split('T')[0]}
+            onChange={(e) => setNewEmp({ ...newEmp, joinDate: e.target.value })}
+          />
+          <Input
+            label="Core Skills (comma-separated)"
+            placeholder="e.g. React, Node.js, Python, AWS"
+            value={newEmp.skills || ''}
+            onChange={(e) => setNewEmp({ ...newEmp, skills: e.target.value })}
           />
         </form>
       </Modal>
+
+      {/* Edit Employee Modal */}
+      {editEmpModal && (
+        <Modal
+          isOpen={!!editEmpModal}
+          onClose={() => setEditEmpModal(null)}
+          title={`Edit Profile — ${editEmpModal.name}`}
+          subtitle="Update employee information and skill set."
+          footer={
+            <>
+              <SecondaryButton onClick={() => setEditEmpModal(null)}>Cancel</SecondaryButton>
+              <PrimaryButton onClick={handleSaveEditEmployee} variant="purple">
+                Update Profile
+              </PrimaryButton>
+            </>
+          }
+        >
+          <form onSubmit={handleSaveEditEmployee} className="space-y-4">
+            <Input
+              label="Full Name *"
+              value={editEmpModal.name || ''}
+              onChange={(e) => setEditEmpModal({ ...editEmpModal, name: e.target.value })}
+              required
+            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Designation / Role *"
+                value={editEmpModal.role || ''}
+                onChange={(e) => setEditEmpModal({ ...editEmpModal, role: e.target.value })}
+                required
+              />
+              <Select
+                label="Department *"
+                options={departments.filter((d) => d !== 'All')}
+                value={editEmpModal.department || 'Web & Cloud'}
+                onChange={(e) => setEditEmpModal({ ...editEmpModal, department: e.target.value })}
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Work Email *"
+                type="email"
+                value={editEmpModal.email || ''}
+                onChange={(e) => setEditEmpModal({ ...editEmpModal, email: e.target.value })}
+                required
+              />
+              <Input
+                label="Phone Number *"
+                value={editEmpModal.phone || ''}
+                onChange={(e) => setEditEmpModal({ ...editEmpModal, phone: e.target.value })}
+                required
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Select
+                label="Base Office Location *"
+                options={['Mumbai Office', 'Bengaluru Office', 'Pune Office', 'Remote']}
+                value={editEmpModal.location || 'Mumbai Office'}
+                onChange={(e) => setEditEmpModal({ ...editEmpModal, location: e.target.value })}
+              />
+              <Select
+                label="Employment Status"
+                options={['Active', 'On Leave', 'Inactive']}
+                value={editEmpModal.status || 'Active'}
+                onChange={(e) => setEditEmpModal({ ...editEmpModal, status: e.target.value })}
+              />
+            </div>
+            <Input
+              label="Joining Date"
+              type="date"
+              value={editEmpModal.joinDate || '2022-01-01'}
+              onChange={(e) => setEditEmpModal({ ...editEmpModal, joinDate: e.target.value })}
+            />
+            <Input
+              label="Core Skills (comma-separated)"
+              placeholder="e.g. React, Node.js, Python, AWS"
+              value={editEmpModal.skills || ''}
+              onChange={(e) => setEditEmpModal({ ...editEmpModal, skills: e.target.value })}
+            />
+          </form>
+        </Modal>
+      )}
     </PageTransition>
   );
 };

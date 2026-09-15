@@ -219,11 +219,9 @@ export const TasksKanbanPage = () => {
                       <span className="flex items-center gap-1 font-medium text-slate-500">
                         <Clock className="w-3 h-3 text-slate-400" /> {formatDate(task.dueDate)}
                       </span>
-                      <img
-                        src={task.assignedTo?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}
-                        alt="avatar"
-                        className="w-5 h-5 rounded-full"
-                      />
+                      <div className="w-5 h-5 rounded-full bg-purple-100 text-brand-primary flex items-center justify-center shrink-0" title={task.assignedTo?.name || 'Assignee'}>
+                        <User className="w-3 h-3" />
+                      </div>
                     </div>
                   </div>
                 ))}

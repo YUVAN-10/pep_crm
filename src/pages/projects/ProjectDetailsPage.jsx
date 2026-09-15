@@ -18,6 +18,7 @@ import { useNotifications } from '../../context/NotificationContext';
 import { useCRM } from '../../context/CRMContext';
 import {
   ArrowLeft,
+  User,
   Calendar,
   Clock,
   CheckCircle2,
@@ -257,11 +258,9 @@ export const ProjectDetailsPage = () => {
               <div className="space-y-3">
                 {project.team?.map((member, i) => (
                   <div key={i} className="flex items-center gap-3 p-2.5 rounded-[14px] bg-slate-50 border border-slate-100">
-                    <img
-                      src={member.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}
-                      alt={member.name}
-                      className="w-9 h-9 rounded-full object-cover"
-                    />
+                    <div className="w-9 h-9 rounded-full bg-purple-100 text-brand-primary flex items-center justify-center shrink-0">
+                      <User className="w-5 h-5" />
+                    </div>
                     <div>
                       <p className="text-xs font-bold text-slate-900">{member.name}</p>
                       <p className="text-[11px] text-brand-primary font-medium">{member.role}</p>
