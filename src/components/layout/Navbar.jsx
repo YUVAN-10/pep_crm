@@ -7,6 +7,7 @@ import {
   Settings,
   Search,
   Bell,
+  User,
 } from 'lucide-react';
 import Avatar from '../common/Avatar';
 import { useAuth } from '../../context/AuthContext';
@@ -58,7 +59,7 @@ export const Navbar = ({ onMobileMenuToggle }) => {
         </div>
       </div>
 
-      {/* Right Actions: Notification Bell + Avatar */}
+      {/* Right Actions: Notification Bell + Avatar Vector Icon */}
       <div className="flex items-center gap-3">
         {/* Notification Bell Circle */}
         <button
@@ -69,14 +70,15 @@ export const Navbar = ({ onMobileMenuToggle }) => {
           <Bell className="w-4 h-4" />
         </button>
 
-        {/* User Profile Menu */}
+        {/* User Profile Menu with Vector Man Icon */}
         <div className="relative">
           <button
             type="button"
             onClick={() => setShowProfileMenu(!showProfileMenu)}
-            className="flex items-center gap-2 p-0.5 rounded-full hover:ring-2 hover:ring-[#1677FF]/30 transition-all"
+            className="w-8 h-8 rounded-full bg-blue-100 text-[#1677FF] border border-blue-200 flex items-center justify-center shadow-2xs hover:bg-blue-200/70 transition-all"
+            title={currentUser?.name || 'Sanjay Verma'}
           >
-            <Avatar src={currentUser?.avatar} name={currentUser?.name} size="sm" />
+            <User className="w-4 h-4" />
           </button>
 
           {showProfileMenu && (
