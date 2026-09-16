@@ -9,86 +9,87 @@ export const StatCard = ({
   value,
   growth,
   isPositive = true,
+  trendDirection = 'up', // 'up' | 'down' | 'flat'
   icon: Icon,
   sparklineData = [12, 16, 14, 20, 24, 22, 30],
-  iconColor = 'purple', // 'purple' | 'orange' | 'green' | 'blue'
-  subtext = 'vs last month',
+  variant = 'blue', // 'blue' | 'green' | 'red'
+  subtext = '/month',
   className = '',
+  onClick,
 }) => {
-  const iconThemeMap = {
-    purple: {
-      bg: 'bg-purple-100/70 text-brand-primary',
-      sparkColor: '#35135F',
-      dot: 'bg-brand-primary',
-    },
-    orange: {
-      bg: 'bg-amber-100/70 text-brand-accent',
-      sparkColor: '#F59E0B',
-      dot: 'bg-brand-accent',
+  const cardThemes = {
+    blue: {
+      cardBg: 'bg-gradient-to-br from-[#EEF5FF] via-white to-white border-slate-100/90',
+      iconBg: 'bg-[#E6F0FF] text-[#1677FF]',
+      sparkColor: '#1677FF',
+      trendText: 'text-[#1677FF]',
     },
     green: {
-      bg: 'bg-emerald-100/70 text-emerald-600',
+      cardBg: 'bg-gradient-to-br from-[#E6F8F0] via-white to-white border-slate-100/90',
+      iconBg: 'bg-[#E6F8E8] text-[#10B981]',
       sparkColor: '#10B981',
-      dot: 'bg-emerald-500',
+      trendText: 'text-[#10B981]',
     },
-    blue: {
-      bg: 'bg-blue-100/70 text-blue-600',
-      sparkColor: '#3B82F6',
-      dot: 'bg-blue-500',
+    red: {
+      cardBg: 'bg-gradient-to-br from-[#FDF0F0] via-white to-white border-slate-100/90',
+      iconBg: 'bg-[#FDE8E8] text-[#F43F5E]',
+      sparkColor: '#F43F5E',
+      trendText: 'text-[#F43F5E]',
     },
   };
 
-  const theme = iconThemeMap[iconColor] || iconThemeMap.purple;
+  const theme = cardThemes[variant] || cardThemes.blue;
+
+  const renderTrendIcon = () => {
+    if (trendDirection === 'flat') return '↔';
+    if (trendDirection === 'down' || !isPositive) return '↓';
+    return '↑';
+  };
 
   return (
-    <Card hover className={cn('relative overflow-hidden group', className)}>
+    <div
+      onClick={onClick}
+      className={cn(
+        'rounded-[22px] border p-5 shadow-2xs transition-all duration-200 bg-white relative overflow-hidden',
+        theme.cardBg,
+        onClick && 'cursor-pointer hover:shadow-md',
+        className
+      )}
+    >
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
           {Icon && (
-            <div className={cn('w-12 h-12 rounded-[16px] flex items-center justify-center transition-transform duration-300 group-hover:scale-105', theme.bg)}>
-              <Icon className="w-6 h-6" />
+            <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center shrink-0', theme.iconBg)}>
+              <Icon className="w-4 h-4" />
             </div>
           )}
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-brand-textSecondary">{title}</p>
-            <h3 className="text-2xl lg:text-3xl font-bold font-sans tracking-tight text-brand-textPrimary mt-1">
-              {value}
-            </h3>
-          </div>
+          <p className="text-xs font-medium text-slate-500 truncate">{title}</p>
+        </div>
+      </div>
+
+      <div className="mt-3 flex items-end justify-between">
+        <div>
+          <h3 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+            {value}
+          </h3>
+          {growth && (
+            <div className="mt-2 flex items-center gap-1 text-xs">
+              <span className={cn('font-bold flex items-center gap-0.5', theme.trendText)}>
+                {renderTrendIcon()} {growth}
+              </span>
+              <span className="text-slate-400 font-normal">{subtext}</span>
+            </div>
+          )}
         </div>
 
-        {/* Sparkline chart */}
+        {/* Smooth Curved Sparkline */}
         {sparklineData && (
-          <div className="hidden sm:block">
-            <Sparkline data={sparklineData} color={theme.sparkColor} width={75} height={32} />
+          <div className="shrink-0 pb-1">
+            <Sparkline data={sparklineData} color={theme.sparkColor} width={90} height={36} />
           </div>
         )}
       </div>
-
-      <div className="mt-4 pt-3.5 border-t border-slate-100/80 flex items-center justify-between">
-        <div className="flex items-center gap-1.5">
-          <span
-            className={cn(
-              'inline-flex items-center gap-0.5 text-xs font-semibold px-2 py-0.5 rounded-full',
-              isPositive ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
-            )}
-          >
-            {isPositive ? (
-              <ArrowUpRight className="w-3.5 h-3.5" />
-            ) : (
-              <ArrowDownRight className="w-3.5 h-3.5" />
-            )}
-            {growth}
-          </span>
-          <span className="text-xs text-slate-400 font-medium">{subtext}</span>
-        </div>
-
-        <div className="flex items-center gap-1">
-          <span className={cn('w-1.5 h-1.5 rounded-full', theme.dot)}></span>
-          <span className="text-[11px] text-slate-400 font-medium">Realtime</span>
-        </div>
-      </div>
-    </Card>
+    </div>
   );
 };
 

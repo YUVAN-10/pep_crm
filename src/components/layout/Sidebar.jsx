@@ -2,8 +2,9 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { NAV_SECTIONS } from '../../utils/constants';
 import { PepLogo } from '../../assets/logo/PepLogo';
-import { LogOut, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { LogOut, ChevronLeft, ChevronRight, X, User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useCRM } from '../../context/CRMContext';
 import { cn } from '../../utils/cn';
 
 export const Sidebar = ({
@@ -13,11 +14,29 @@ export const Sidebar = ({
   setMobileOpen,
 }) => {
   const { logout, currentUser } = useAuth();
+  const { followups, leads } = useCRM();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  // Badge calculations
+  const todayStr = new Date().toISOString().split('T')[0];
+  const pendingFollowupsCount = followups.filter(
+    (f) => f.status === 'Pending' || f.status === 'Overdue' || f.date <= todayStr
+  ).length;
+  const activeLeadsCount = leads.filter((l) => l.stage !== 'won' && l.stage !== 'lost').length;
+
+  const getBadgeCount = (itemPath) => {
+    if (itemPath === '/follow-ups' && pendingFollowupsCount > 0) {
+      return pendingFollowupsCount;
+    }
+    if (itemPath === '/leads' && activeLeadsCount > 0) {
+      return activeLeadsCount;
+    }
+    return null;
   };
 
   return (
@@ -30,23 +49,18 @@ export const Sidebar = ({
         />
       )}
 
-      {/* Sidebar Container - 260px width */}
+      {/* Sidebar Container */}
       <aside
         className={cn(
-          'fixed top-0 bottom-0 left-0 z-50 flex flex-col bg-white text-slate-900 border-r border-slate-200/80 transition-all duration-300 shadow-sm overflow-hidden select-none',
-          collapsed ? 'w-20' : 'w-[260px]',
-          // Mobile state
+          'fixed top-0 bottom-0 left-0 z-50 flex flex-col bg-[#F0F4F8] text-slate-800 border-r border-slate-200/60 transition-all duration-300 overflow-hidden select-none',
+          collapsed ? 'w-20' : 'w-[250px]',
           mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
       >
-        {/* Top Sticky Logo Header */}
-        <div className="flex items-center justify-between h-20 px-5 border-b border-slate-100 bg-white sticky top-0 z-10 shrink-0">
-          <div className="flex items-center overflow-hidden">
-            {collapsed ? (
-              <PepLogo size={36} showText={false} variant="dark" />
-            ) : (
-              <PepLogo size={36} showText={true} variant="dark" />
-            )}
+        {/* Top Header Logo */}
+        <div className="flex items-center justify-between h-16 px-5 bg-[#F0F4F8] sticky top-0 z-10 shrink-0">
+          <div className="flex items-center overflow-hidden cursor-pointer" onClick={() => navigate('/dashboard')}>
+            <PepLogo size={36} showText={!collapsed} variant="dark" />
           </div>
 
           {/* Mobile Close Button */}
@@ -59,18 +73,20 @@ export const Sidebar = ({
           </button>
         </div>
 
-        {/* Grouped Navigation Sections */}
-        <div className="flex-1 overflow-y-auto py-4 px-3 space-y-5">
+        {/* Navigation Sections */}
+        <div className="flex-1 overflow-y-auto py-3 px-3 space-y-4">
           {NAV_SECTIONS.map((section, idx) => (
             <div key={idx} className="space-y-1">
-              {!collapsed && (
-                <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+              {!collapsed && section.title !== 'MAIN' && (
+                <div className="px-3.5 text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1 mt-3">
                   {section.title}
                 </div>
               )}
 
               {section.items.map((item) => {
                 const Icon = item.icon;
+                const badge = getBadgeCount(item.path);
+
                 return (
                   <NavLink
                     key={item.path}
@@ -79,10 +95,10 @@ export const Sidebar = ({
                     title={collapsed ? item.name : undefined}
                     className={({ isActive }) =>
                       cn(
-                        'flex items-center gap-3 px-3.5 py-2.5 rounded-[12px] text-xs font-semibold transition-all duration-200 group relative',
+                        'flex items-center gap-3 px-3.5 py-2.5 rounded-[16px] text-xs transition-all duration-150 group relative',
                         isActive
-                          ? 'bg-purple-50 text-brand-primary border border-purple-200/60 shadow-2xs font-bold'
-                          : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                          ? 'bg-[#E8F3FF] text-[#1677FF] font-bold'
+                          : 'text-[#595959] hover:bg-slate-200/40 hover:text-slate-900 font-medium'
                       )
                     }
                   >
@@ -91,8 +107,8 @@ export const Sidebar = ({
                         <div className="relative flex items-center justify-center">
                           <Icon
                             className={cn(
-                              'w-4 h-4 transition-transform duration-200 group-hover:scale-110',
-                              isActive ? 'text-brand-primary' : 'text-slate-400 group-hover:text-slate-700'
+                              'w-4 h-4 transition-transform duration-200',
+                              isActive ? 'text-[#1677FF]' : 'text-slate-400 group-hover:text-slate-700'
                             )}
                           />
                         </div>
@@ -101,15 +117,10 @@ export const Sidebar = ({
                           <span className="truncate tracking-wide">{item.name}</span>
                         )}
 
-                        {!collapsed && item.badge && (
-                          <span className="ml-auto px-2 py-0.5 text-[10px] font-bold rounded-full bg-purple-100 text-brand-primary">
-                            {item.badge}
+                        {!collapsed && badge && (
+                          <span className="ml-auto px-2 py-0.5 text-[10px] font-bold rounded-full bg-blue-100 text-[#1677FF]">
+                            {badge}
                           </span>
-                        )}
-
-                        {/* Active vertical left pill */}
-                        {isActive && (
-                          <span className="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-brand-primary" />
                         )}
                       </>
                     )}
@@ -120,28 +131,27 @@ export const Sidebar = ({
           ))}
         </div>
 
-        {/* User Card & Logout Footer */}
+        {/* User Footer */}
         <div className="p-3 border-t border-slate-100 bg-slate-50/50 shrink-0">
           {!collapsed ? (
-            <div className="flex items-center gap-3 p-2 rounded-[14px] bg-white border border-slate-200/80 mb-2 shadow-2xs">
-              <img
-                src={currentUser?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}
-                alt="Profile"
-                className="w-9 h-9 rounded-full object-cover ring-2 ring-purple-100"
-              />
+            <div className="flex items-center gap-3 p-2.5 rounded-[14px] bg-white border border-slate-200/80 mb-2 shadow-2xs">
+              <div className="w-9 h-9 rounded-full bg-blue-100 text-[#1677FF] border border-blue-200 flex items-center justify-center shrink-0">
+                <User className="w-5 h-5" />
+              </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-slate-800 truncate">{currentUser?.name}</p>
-                <p className="text-[11px] text-slate-400 font-medium truncate">{currentUser?.role}</p>
+                <p className="text-xs font-bold text-slate-800 truncate">
+                  {currentUser?.name || 'Sanjay Verma'}
+                </p>
+                <p className="text-[11px] text-slate-500 font-medium truncate">
+                  {currentUser?.role || 'Managing Director'}
+                </p>
               </div>
             </div>
           ) : (
             <div className="flex justify-center mb-2">
-              <img
-                src={currentUser?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'}
-                alt="Profile"
-                title={currentUser?.name}
-                className="w-9 h-9 rounded-full object-cover ring-2 ring-purple-100"
-              />
+              <div className="w-9 h-9 rounded-full bg-blue-100 text-[#1677FF] border border-blue-200 flex items-center justify-center shrink-0" title={currentUser?.name || 'Sanjay Verma'}>
+                <User className="w-5 h-5" />
+              </div>
             </div>
           )}
 
@@ -159,7 +169,7 @@ export const Sidebar = ({
             {!collapsed && <span>Log Out</span>}
           </button>
 
-          {/* Collapse Toggle (Desktop only) */}
+          {/* Collapse Toggle */}
           <div className="hidden lg:flex justify-end pt-2">
             <button
               type="button"

@@ -21,9 +21,9 @@ export const Card = ({
     <div
       onClick={onClick}
       className={cn(
-        'bg-white rounded-[22px] border border-slate-200/80 shadow-2xs transition-all duration-200',
+        'bg-white rounded-[22px] border border-slate-100/90 shadow-2xs transition-all duration-200 text-slate-900',
         paddingClasses[padding],
-        hover && 'hover:-translate-y-0.5 hover:shadow-md hover:border-purple-200/80 cursor-pointer',
+        hover && 'hover:-translate-y-0.5 hover:shadow-md hover:border-blue-200/80 cursor-pointer',
         className
       )}
       {...props}

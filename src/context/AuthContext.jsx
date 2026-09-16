@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
     name: 'Sanjay Verma',
     email: 'admin@pepsoftwares.com',
     role: 'Managing Director',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    avatar: null,
     company: 'PEP Software Enterprise',
   });
 
@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
       name: 'Sanjay Verma',
       email: email || 'admin@pepsoftwares.com',
       role: 'Managing Director',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+      avatar: null,
       company: 'PEP Software Enterprise',
     });
     setIsAuthenticated(true);

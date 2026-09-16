@@ -27,7 +27,7 @@ export const SecondaryButton = ({
       onClick={onClick}
       disabled={disabled || loading}
       className={cn(
-        'inline-flex items-center justify-center rounded-[14px] bg-purple-50/80 hover:bg-purple-100/90 text-brand-primary border border-purple-200/60 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-400/30 disabled:opacity-50 disabled:cursor-not-allowed select-none cursor-pointer',
+        'inline-flex items-center justify-center rounded-[14px] bg-purple-50/80 dark:bg-purple-950/60 hover:bg-purple-100/90 dark:hover:bg-purple-900/60 text-brand-primary dark:text-purple-300 border border-purple-200/60 dark:border-purple-800/60 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-400/30 disabled:opacity-50 disabled:cursor-not-allowed select-none cursor-pointer',
         sizeClasses[size],
         fullWidth && 'w-full',
         className
@@ -35,7 +35,7 @@ export const SecondaryButton = ({
       {...props}
     >
       {loading ? (
-        <Loader2 className="w-4 h-4 animate-spin text-brand-primary" />
+        <Loader2 className="w-4 h-4 animate-spin text-brand-primary dark:text-purple-300" />
       ) : (
         <>
           {Icon && iconPosition === 'left' && <Icon className="w-4 h-4 shrink-0" />}

@@ -43,11 +43,15 @@ export const Avatar = ({
     <div className={cn('relative inline-flex shrink-0 select-none', className)}>
       <div
         className={cn(
-          'rounded-full bg-purple-100 text-brand-primary font-bold flex items-center justify-center border border-purple-200 shadow-2xs',
+          'rounded-full bg-blue-100 text-[#1677FF] font-bold flex items-center justify-center border border-blue-200 shadow-2xs overflow-hidden',
           sizeClasses[size]
         )}
       >
-        <User className={iconSizes[size] || 'w-5 h-5'} />
+        {src ? (
+          <img src={src} alt={name} className="w-full h-full object-cover" />
+        ) : (
+          <User className={iconSizes[size] || 'w-5 h-5'} />
+        )}
       </div>
 
       {status && (

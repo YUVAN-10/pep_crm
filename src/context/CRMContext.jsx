@@ -4,11 +4,10 @@ import { useNotifications } from './NotificationContext';
 const CRMContext = createContext();
 
 const INITIAL_EMPLOYEES = [
-  { id: 'emp-1', name: 'Sanjay Verma', role: 'Managing Director & Owner', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150' },
-  { id: 'emp-2', name: 'Alice', role: 'Senior Developer', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150' },
-  { id: 'emp-3', name: 'Rohan Sharma', role: 'Sales Lead', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150' },
-  { id: 'emp-4', name: 'Pooja Nair', role: 'Project Manager', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150' },
-  { id: 'emp-5', name: 'Vishal Kumar', role: 'Fullstack Developer', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150' },
+  { id: 'emp-1', name: 'Sanjay Verma', role: 'Managing Director & Owner', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150', email: 'sanjay@pepsoftware.com', phone: '+91 98200 11223' },
+  { id: 'emp-2', name: 'Rohan Sharma', role: 'Sales Lead', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', email: 'rohan@pepsoftware.com', phone: '+91 98200 44556' },
+  { id: 'emp-3', name: 'Pooja Nair', role: 'Project Manager', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150', email: 'pooja@pepsoftware.com', phone: '+91 98200 77889' },
+  { id: 'emp-4', name: 'Vishal Kumar', role: 'Fullstack Developer', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150', email: 'vishal@pepsoftware.com', phone: '+91 98200 99001' },
 ];
 
 const INITIAL_LEADS = [
@@ -20,13 +19,17 @@ const INITIAL_LEADS = [
     email: 'ramesh@abchospital.org',
     phone: '+91 98230 11990',
     value: 1500000,
-    stage: 'new',
+    stage: 'discussion',
     source: 'Website Form',
     service: 'Website Development',
     assignedTo: { name: 'Rohan Sharma', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150' },
     createdDate: '2026-03-01',
     expectedClose: '2026-04-15',
     notes: 'Inquiry for patient appointment portal and OPD management web application.',
+    history: [
+      { id: 'h1', date: '2026-03-01 10:30 AM', author: 'Rohan Sharma', text: 'Lead created via Website Form inquiry for OPD portal.' },
+      { id: 'h2', date: '2026-03-05 02:15 PM', author: 'Rohan Sharma', text: 'Discovery call completed. Sent technical capability deck.' },
+    ],
   },
   {
     id: 'lead-1',
@@ -36,13 +39,17 @@ const INITIAL_LEADS = [
     email: 'ananya@nexgendigital.com',
     phone: '+91 98201 44521',
     value: 1850000,
-    stage: 'meeting',
+    stage: 'proposal',
     source: 'Referral',
-    service: 'Custom Software',
+    service: 'Custom Software Development',
     assignedTo: { name: 'Sanjay Verma', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150' },
     createdDate: '2026-02-14',
     expectedClose: '2026-03-30',
     notes: 'Requirement for custom multi-tenant distributor commerce suite.',
+    history: [
+      { id: 'h1', date: '2026-02-14 11:00 AM', author: 'Sanjay Verma', text: 'Lead introduced via BNI referral.' },
+      { id: 'h2', date: '2026-02-28 04:00 PM', author: 'Sanjay Verma', text: 'Presented architecture design proposal.' },
+    ],
   },
   {
     id: 'lead-2',
@@ -52,13 +59,16 @@ const INITIAL_LEADS = [
     email: 'simran@quickbiteapp.com',
     phone: '+91 98765 43210',
     value: 850000,
-    stage: 'proposal',
-    source: 'LinkedIn InMail',
-    service: 'Mobile App',
+    stage: 'contacted',
+    source: 'LinkedIn',
+    service: 'Mobile App Development',
     assignedTo: { name: 'Pooja Nair', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150' },
     createdDate: '2026-02-22',
     expectedClose: '2026-04-10',
     notes: 'Flutter delivery rider mobile application revamp.',
+    history: [
+      { id: 'h1', date: '2026-02-22 03:20 PM', author: 'Pooja Nair', text: 'Inbound message on LinkedIn regarding rider app UI redesign.' },
+    ],
   },
   {
     id: 'lead-3',
@@ -68,13 +78,17 @@ const INITIAL_LEADS = [
     email: 'rahul@apexhealthlog.in',
     phone: '+91 98450 12890',
     value: 2400000,
-    stage: 'qualified',
-    source: 'Cold Outreach',
-    service: 'Mobile App',
-    assignedTo: { name: 'Alice', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150' },
+    stage: 'won',
+    source: 'Cold Call',
+    service: 'Mobile App Development',
+    assignedTo: { name: 'Rohan Sharma', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150' },
     createdDate: '2026-01-20',
     expectedClose: '2026-03-25',
     notes: 'Bluetooth BLE cold chain temperature monitor app.',
+    history: [
+      { id: 'h1', date: '2026-01-20 01:00 PM', author: 'Rohan Sharma', text: 'Outreach call initiated with Dr. Rahul.' },
+      { id: 'h2', date: '2026-03-01 11:30 AM', author: 'Rohan Sharma', text: 'Contract signed! Won lead & converted to customer.' },
+    ],
   },
   {
     id: 'lead-4',
@@ -86,11 +100,14 @@ const INITIAL_LEADS = [
     value: 1250000,
     stage: 'won',
     source: 'Website Form',
-    service: 'Custom Software',
+    service: 'Custom Software Development',
     assignedTo: { name: 'Vishal Kumar', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150' },
     createdDate: '2026-01-10',
     expectedClose: '2026-02-26',
     notes: 'Enterprise Multi-tenant Cloud Management Console.',
+    history: [
+      { id: 'h1', date: '2026-01-10 10:00 AM', author: 'Vishal Kumar', text: 'Website inquiry registered.' },
+    ],
   },
 ];
 
@@ -99,886 +116,355 @@ const INITIAL_FOLLOWUPS = [
     id: 'fol-1',
     leadId: 'lead-abc',
     clientName: 'ABC Hospital',
-    title: 'Initial Discovery Call',
+    title: 'Initial Scope & Requirements Discovery Call',
     date: '2026-03-16',
     time: '11:00 AM',
+    type: 'Call',
     assignedTo: 'Rohan Sharma',
-    status: 'Pending', // Pending | Completed | Overdue
-    notes: 'Review OPD workflow requirements',
+    status: 'Pending',
+    notes: 'Review OPD workflow requirements and patient appointment portal specifications.',
   },
   {
     id: 'fol-2',
     leadId: 'lead-1',
     clientName: 'NextGen Digital Solutions',
-    title: 'Architecture Review Session',
+    title: 'Architecture Review Session & Budget Discussion',
     date: '2026-03-14',
     time: '02:30 PM',
+    type: 'Meeting',
     assignedTo: 'Sanjay Verma',
     status: 'Overdue',
-    notes: 'Discuss SAP legacy DB connector specs',
-  }
-];
-
-const INITIAL_OPPORTUNITIES = [
-  {
-    id: 'opp-1',
-    name: 'CloudScale Enterprise Portal',
-    customer: 'CloudScale Enterprise',
-    service: 'Custom Software',
-    value: 1250000,
-    probability: '80%',
-    expectedClose: '2026-03-30',
-    assignedTo: 'Vishal Kumar',
-    stage: 'quotation_sent',
-    nextAction: 'Follow up on technical proposal feedback',
+    notes: 'Discuss SAP legacy DB connector specs and pricing schedule.',
   },
   {
-    id: 'opp-2',
-    name: 'QuickBite Rider App Revamp',
-    customer: 'QuickBite FoodTech',
-    service: 'Mobile App',
-    value: 850000,
-    probability: '60%',
-    expectedClose: '2026-04-10',
+    id: 'fol-3',
+    leadId: 'lead-2',
+    clientName: 'QuickBite FoodTech',
+    title: 'WhatsApp Demo Link Follow-up',
+    date: '2026-03-18',
+    time: '04:00 PM',
+    type: 'WhatsApp',
     assignedTo: 'Pooja Nair',
-    stage: 'requirement',
-    nextAction: 'Schedule technical architecture demo',
+    status: 'Pending',
+    notes: 'Share Flutter mobile app demo video and confirm tech stack.',
+  },
+  {
+    id: 'fol-4',
+    leadId: 'lead-3',
+    clientName: 'Apex Health Logistics',
+    title: 'Kickoff Agreement Confirmation',
+    date: '2026-03-01',
+    time: '11:00 AM',
+    type: 'Email',
+    assignedTo: 'Rohan Sharma',
+    status: 'Completed',
+    outcome: 'Client signed agreement & sent advance payment copy.',
+    notes: 'Confirm project start date with technical team.',
   }
 ];
 
-const INITIAL_PROJECTS = [
+const INITIAL_CUSTOMERS = [
   {
-    id: 'proj-1',
-    title: 'NextGen B2B Distributor Commerce Suite',
-    client: 'NextGen Digital Solutions',
-    type: 'Custom Software',
-    status: 'in_progress',
-    budget: 1850000,
-    progress: 75,
-    startDate: '2026-01-15',
-    deadline: '2026-04-30',
-    team: ['Sanjay Verma', 'Alice', 'Vishal Kumar'],
-    tasksCount: 5,
-    completedTasksCount: 3,
-  }
-];
-
-const INITIAL_TASKS = [
-  {
-    id: 'tsk-1',
-    projectId: 'proj-1',
-    title: 'Design Database Schema for B2B Bulk Orders',
-    columnId: 'completed',
-    assignedTo: 'Alice',
-    priority: 'urgent',
-    dueDate: '2026-02-15',
+    id: 'cust-1',
+    company: 'Apex Health Logistics',
+    contactPerson: 'Dr. Rahul Kapoor',
+    role: 'COO',
+    email: 'rahul@apexhealthlog.in',
+    phone: '+91 98450 12890',
+    totalSpent: 2400000,
+    serviceUsed: 'Mobile App Development',
+    status: 'Active',
+    joinedDate: '2026-03-01',
+    notes: 'Bluetooth BLE cold chain temperature monitor app project.',
   },
   {
-    id: 'tsk-2',
-    projectId: 'proj-1',
-    title: 'Build GST E-Invoicing Webhook Engine',
-    columnId: 'in_progress',
-    assignedTo: 'Vishal Kumar',
-    priority: 'high',
-    dueDate: '2026-03-20',
-  }
-];
-
-const INITIAL_ACTIVITIES = [
-  {
-    id: 'act-1',
-    user: 'Sanjay Verma',
-    action: 'initialized Testing Mode',
-    target: 'PEP CRM System',
-    time: 'Just now',
-    type: 'system',
-  },
-  {
-    id: 'act-2',
-    user: 'Rohan Sharma',
-    action: 'created Lead',
-    target: 'ABC Hospital',
-    time: '10 mins ago',
-    type: 'lead',
-  }
-];
-
-const INITIAL_REQUIREMENTS = [
-  {
-    id: 'req-1',
-    customer: 'ABC Hospital',
-    projectType: 'Healthcare Portal',
-    businessRequirement: 'Hospital Management & Patient OPD Portal with WhatsApp API notifications.',
-    modules: 'OPD Booking, Billing, WhatsApp Alerts',
-    userTypes: 'Doctor, Patient, Admin',
-    integrations: 'HMIS REST APIs, WhatsApp Cloud API',
-    hosting: 'Cloud VPS',
-    domain: 'abchospital.in',
-    timeline: '2 Months',
-    referenceLinks: 'https://abchospital.in',
-    notes: 'Initial requirement documented for ABC Hospital.',
-    status: 'Ready for Quotation',
-  },
-  {
-    id: 'req-2',
-    customer: 'NexGen Digital Solutions',
-    projectType: 'E-commerce',
-    businessRequirement: 'B2B Distributor Commerce Portal with bulk e-invoicing and GST calculation.',
-    modules: 'Catalog, Cart, GST Engine, Credit Line Tracker, Order Dispatcher',
-    userTypes: 'Super Admin, Distributor, Retailer, Finance Clerk',
-    integrations: 'Razorpay, ICICI Bank Webhook, Tally ERP API',
-    hosting: 'AWS EC2 + Cloudflare CDN',
-    domain: 'b2b.nexgendigital.io',
-    timeline: '3 Months',
-    referenceLinks: 'https://figma.com/file/sample-nexgen-b2b',
-    notes: 'Must support mobile viewport for distributors in field.',
-    status: 'Ready for Quotation',
-  },
-  {
-    id: 'req-3',
-    customer: 'Apex Health Logistics',
-    projectType: 'Mobile App',
-    businessRequirement: 'Cold-chain BLE temperature monitoring driver mobile app on iOS/Android.',
-    modules: 'BLE Scanner, Background GPS, Offline SQLite Sync, Alert Push Notification',
-    userTypes: 'Truck Driver, Logistics Manager, Warehouse Operator',
-    integrations: 'Firebase Cloud Messaging, AWS IoT Core',
-    hosting: 'Firebase Hosting + Google Cloud Functions',
-    domain: 'app.apexhealthlog.in',
-    timeline: '2.5 Months',
-    referenceLinks: 'https://github.com/apex-sensor-spec',
-    notes: 'BLE sensor polling frequency every 30 seconds.',
-    status: 'Confirmed',
-  },
-];
-
-const INITIAL_QUOTATIONS = [
-  {
-    id: 'quote-1',
-    quotationNumber: 'QT-2026-041',
-    customer: 'NexGen Digital Solutions',
-    opportunity: 'NexGen B2B Distributor Commerce Suite',
-    amount: 1850000,
-    quotationDate: '2026-02-10',
-    sentDate: '2026-02-12',
-    validUntil: '2026-03-31',
-    status: 'Accepted',
-    zohoInvoiceUrl: 'https://books.zoho.com/app/invoices/quote-041',
-    notes: 'Quotation accepted after volume discount approval.',
-  },
-  {
-    id: 'quote-2',
-    quotationNumber: 'QT-2026-044',
-    customer: 'QuickBite FoodTech Network',
-    opportunity: 'QuickBite Rider App Revamp',
-    amount: 850000,
-    quotationDate: '2026-02-28',
-    sentDate: '2026-03-01',
-    validUntil: '2026-04-15',
-    status: 'Sent',
-    zohoInvoiceUrl: 'https://books.zoho.com/app/invoices/quote-044',
-    notes: 'Awaiting client board review.',
-  },
-  {
-    id: 'quote-3',
-    quotationNumber: 'QT-2026-045',
-    customer: 'Apex Health Logistics',
-    opportunity: 'Apex Cold-Chain Mobile App',
-    amount: 1200000,
-    quotationDate: '2026-01-15',
-    sentDate: '2026-01-16',
-    validUntil: '2026-02-15',
-    status: 'Expired',
-    zohoInvoiceUrl: 'https://books.zoho.com/app/invoices/quote-045',
-    notes: 'Expired proposal.',
-  },
-  {
-    id: 'quote-4',
-    quotationNumber: 'QT-2026-046',
-    customer: 'CloudScale Enterprise',
-    opportunity: 'Cloud Management Dashboard',
-    amount: 1400000,
-    quotationDate: '2026-03-10',
-    sentDate: '2026-03-10',
-    validUntil: '2026-04-10',
-    status: 'Draft',
-    zohoInvoiceUrl: 'https://books.zoho.com/app/invoices/quote-046',
-    notes: 'Draft quotation under internal review.',
+    id: 'cust-2',
+    company: 'CloudScale Enterprise',
+    contactPerson: 'Rajeev Malhotra',
+    role: 'Head of IT',
+    email: 'r.malhotra@cloudscale.io',
+    phone: '+91 98112 34567',
+    totalSpent: 1250000,
+    serviceUsed: 'Custom Software Development',
+    status: 'Active',
+    joinedDate: '2026-02-26',
+    notes: 'Enterprise Multi-tenant Cloud Management Console.',
   },
 ];
 
 export const CRMProvider = ({ children }) => {
   const { addNotification } = useNotifications();
 
-  const [isTestingMode, setIsTestingMode] = useState(true);
   const [leads, setLeads] = useState(INITIAL_LEADS);
   const [followups, setFollowups] = useState(INITIAL_FOLLOWUPS);
-  const [opportunities, setOpportunities] = useState(INITIAL_OPPORTUNITIES);
-  const [requirements, setRequirements] = useState(INITIAL_REQUIREMENTS);
-  const [quotations, setQuotations] = useState(INITIAL_QUOTATIONS);
-  const [clients, setClients] = useState([
-    { id: 'cli-1', company: 'NextGen Digital Solutions', contactPerson: 'Ananya Deshmukh', totalSpent: 1850000, activeProjects: 1, status: 'Active' },
-    { id: 'cli-2', company: 'Apex Health Logistics', contactPerson: 'Dr. Rahul Kapoor', totalSpent: 2400000, activeProjects: 1, status: 'Active' }
-  ]);
-  const [projects, setProjects] = useState(INITIAL_PROJECTS);
-  const [tasks, setTasks] = useState(INITIAL_TASKS);
-  const [invoices, setInvoices] = useState([
-    { id: 'inv-1', invoiceNumber: 'INV-2026-001', client: 'NextGen Digital Solutions', amount: 450000, total: 531000, status: 'Paid', issueDate: '2026-02-01', dueDate: '2026-02-15' },
-    { id: 'inv-2', invoiceNumber: 'INV-2026-002', client: 'Apex Health Logistics', amount: 850000, total: 1003000, status: 'Pending', issueDate: '2026-03-01', dueDate: '2026-03-20' }
-  ]);
-  const [activities, setActivities] = useState(INITIAL_ACTIVITIES);
+  const [customers, setCustomers] = useState(INITIAL_CUSTOMERS);
+  const [employees, setEmployees] = useState(INITIAL_EMPLOYEES);
 
-  // QA Checklist Tracking
-  const [qaChecklist, setQaChecklist] = useState({
-    Navigation: true,
-    Leads: true,
-    Followups: true,
-    Opportunity: true,
-    Requirement: true,
-    Quotation: true,
-    Customer: true,
-    Project: true,
-    Tasks: true,
-    Payments: true,
-    Reports: true,
-    Notifications: true,
-    Timeline: true,
+  const [companySettings, setCompanySettings] = useState({
+    name: 'Pep Software',
+    email: 'contact@pepsoftware.com',
+    phone: '+91 98765 00000',
+    website: 'https://pepsoftware.com',
+    address: 'Mumbai, Maharashtra, India',
+    services: [
+      'Website Development',
+      'Mobile App Development',
+      'Custom Software Development',
+      'E-commerce Development',
+    ],
   });
-
-  const logActivity = (user, action, target, type = 'general') => {
-    const act = {
-      id: `act-${Date.now()}`,
-      user,
-      action,
-      target,
-      time: 'Just now',
-      type,
-    };
-    setActivities((prev) => [act, ...prev]);
-  };
-
-  const markQaPassed = (moduleName) => {
-    setQaChecklist((prev) => ({ ...prev, [moduleName]: true }));
-  };
 
   // --- ACTIONS ---
 
-  // STEP 1: Add Lead
+  // Add Lead
   const addLead = (leadData) => {
+    const todayStr = new Date().toISOString().split('T')[0];
     const created = {
       id: `lead-${Date.now()}`,
-      name: leadData.name || 'New Lead',
+      name: leadData.name || 'New Lead Company',
       contact: leadData.contact || 'Contact Person',
       role: leadData.role || 'Decision Maker',
       email: leadData.email || 'lead@company.com',
       phone: leadData.phone || '+91 98000 00000',
-      value: Number(leadData.value) || 1000000,
+      value: Number(leadData.value) || 500000,
       stage: leadData.stage || 'new',
       source: leadData.source || 'Website Form',
-      service: leadData.service || 'Custom Software',
-      assignedTo: {
-        name: leadData.assignedTo || 'Rohan Sharma',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
-      },
-      createdDate: new Date().toISOString().split('T')[0],
-      expectedClose: leadData.expectedClose || '2026-04-30',
+      service: leadData.service || 'Website Development',
+      assignedTo: typeof leadData.assignedTo === 'object'
+        ? leadData.assignedTo
+        : { name: leadData.assignedTo || 'Rohan Sharma', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150' },
+      createdDate: todayStr,
+      expectedClose: leadData.expectedClose || '2026-05-15',
       notes: leadData.notes || 'Registered in CRM.',
+      history: [
+        {
+          id: `h-${Date.now()}`,
+          date: `${todayStr} ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+          author: leadData.assignedTo?.name || 'Rohan Sharma',
+          text: `Lead created from source: ${leadData.source || 'Website Form'}. Notes: ${leadData.notes || 'None'}`,
+        },
+      ],
     };
 
     setLeads((prev) => [created, ...prev]);
-    logActivity('Rohan Sharma', 'created Lead', created.name, 'lead');
+
+    // If initial follow-up date specified, schedule follow-up
+    if (leadData.nextFollowupDate) {
+      addFollowup({
+        leadId: created.id,
+        clientName: created.name,
+        title: `Follow-up with ${created.contact}`,
+        date: leadData.nextFollowupDate,
+        time: leadData.nextFollowupTime || '11:00 AM',
+        type: leadData.nextFollowupType || 'Call',
+        assignedTo: created.assignedTo.name,
+        notes: 'Initial scheduled follow-up',
+      });
+    }
+
     addNotification({
-      title: 'New Lead Added',
+      title: 'New Lead Created',
       description: `Lead registered for ${created.name} (${created.service})`,
       category: 'purple',
       relatedRecord: created.name,
     });
-    markQaPassed('Leads');
+
     return created;
   };
 
-  const updateLead = (leadId, updatedData) => {
+  const updateLead = (leadId, updatedFields) => {
     setLeads((prev) =>
       prev.map((l) => {
         if (l.id === leadId) {
           return {
             ...l,
-            ...updatedData,
-            assignedTo: typeof updatedData.assignedTo === 'string'
-              ? { name: updatedData.assignedTo, avatar: l.assignedTo?.avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150' }
-              : (updatedData.assignedTo || l.assignedTo)
+            ...updatedFields,
+            assignedTo: typeof updatedFields.assignedTo === 'string'
+              ? { name: updatedFields.assignedTo, avatar: l.assignedTo?.avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150' }
+              : (updatedFields.assignedTo || l.assignedTo),
           };
         }
         return l;
       })
     );
-    logActivity('System', 'updated Lead details', updatedData.name || leadId, 'lead');
   };
 
-  // STEP 2 & 3: Followups
+  const deleteLead = (leadId) => {
+    setLeads((prev) => prev.filter((l) => l.id !== leadId));
+    setFollowups((prev) => prev.filter((f) => f.leadId !== leadId));
+    addNotification({
+      title: 'Lead Deleted',
+      description: 'Lead and associated follow-ups removed',
+      category: 'orange',
+    });
+  };
+
+  const addNoteToLead = (leadId, noteText, authorName = 'Sanjay Verma') => {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    setLeads((prev) =>
+      prev.map((l) => {
+        if (l.id === leadId) {
+          const newHistory = [
+            {
+              id: `h-${Date.now()}`,
+              date: `${todayStr} ${timeStr}`,
+              author: authorName,
+              text: noteText,
+            },
+            ...(l.history || []),
+          ];
+          return { ...l, history: newHistory };
+        }
+        return l;
+      })
+    );
+  };
+
+  const convertLeadToCustomer = (leadId) => {
+    const lead = leads.find((l) => l.id === leadId);
+    if (!lead) return null;
+
+    // Update lead stage to won
+    updateLead(leadId, { stage: 'won' });
+
+    // Check if customer exists
+    if (!customers.some((c) => c.company.toLowerCase() === lead.name.toLowerCase())) {
+      const newCust = {
+        id: `cust-${Date.now()}`,
+        company: lead.name,
+        contactPerson: lead.contact,
+        role: lead.role,
+        email: lead.email,
+        phone: lead.phone,
+        totalSpent: lead.value,
+        serviceUsed: lead.service,
+        status: 'Active',
+        joinedDate: new Date().toISOString().split('T')[0],
+        notes: `Converted from lead (${lead.source}). ${lead.notes || ''}`,
+      };
+
+      setCustomers((prev) => [newCust, ...prev]);
+
+      addNotification({
+        title: 'Customer Converted!',
+        description: `${lead.name} has been added to Customers roster`,
+        category: 'green',
+        relatedRecord: lead.name,
+      });
+
+      return newCust;
+    }
+    return null;
+  };
+
+  // Follow-ups
   const addFollowup = (folData) => {
     const fol = {
       id: `fol-${Date.now()}`,
-      leadId: folData.leadId || 'lead-abc',
-      customer: folData.customer || folData.clientName || 'ABC Hospital',
-      clientName: folData.customer || folData.clientName || 'ABC Hospital',
-      title: folData.title || `Follow up call with ${folData.customer || folData.clientName || 'Client'}`,
+      leadId: folData.leadId || null,
+      clientName: folData.clientName || 'Client',
+      title: folData.title || `Follow-up call with ${folData.clientName || 'Client'}`,
       date: folData.date || new Date().toISOString().split('T')[0],
       time: folData.time || '11:00 AM',
       type: folData.type || 'Call',
       assignedTo: folData.assignedTo || 'Rohan Sharma',
-      status: folData.status || 'Today',
-      notes: folData.notes || 'Discuss project scope & OPD requirements',
-      relatedModule: folData.relatedModule || 'Lead Record',
-      relatedPath: folData.relatedPath || '/leads',
+      status: folData.status || 'Pending',
+      notes: folData.notes || '',
     };
+
     setFollowups((prev) => [fol, ...prev]);
-    logActivity(fol.assignedTo, 'scheduled Follow-up', `${fol.title} with ${fol.clientName}`, 'followup');
+
+    // Append to lead history if leadId provided
+    if (fol.leadId) {
+      addNoteToLead(
+        fol.leadId,
+        `Follow-up scheduled: "${fol.title}" on ${fol.date} at ${fol.time} (${fol.type})`,
+        fol.assignedTo
+      );
+    }
+
     addNotification({
       title: 'Follow-up Scheduled',
-      description: `Follow-up scheduled with ${fol.clientName} for ${fol.date}`,
+      description: `Follow-up set for ${fol.clientName} on ${fol.date}`,
       category: 'amber',
       relatedRecord: fol.clientName,
     });
-    markQaPassed('Followups');
+
     return fol;
   };
 
-  const completeFollowup = (id, note = 'Client Interested') => {
+  const completeFollowup = (id, outcomeNote = 'Completed successfully', nextFollowupDate = null) => {
+    let targetFol = null;
     setFollowups((prev) =>
-      prev.map((f) => (f.id === id ? { ...f, status: 'Completed', outcome: note } : f))
+      prev.map((f) => {
+        if (f.id === id) {
+          targetFol = f;
+          return { ...f, status: 'Completed', outcome: outcomeNote };
+        }
+        return f;
+      })
     );
-    logActivity('Rohan Sharma', 'completed Follow-up', `Outcome: ${note}`, 'followup');
+
+    if (targetFol && targetFol.leadId) {
+      addNoteToLead(
+        targetFol.leadId,
+        `Completed Follow-up: "${targetFol.title}". Outcome: ${outcomeNote}`,
+        targetFol.assignedTo
+      );
+
+      // If next follow-up requested
+      if (nextFollowupDate) {
+        addFollowup({
+          leadId: targetFol.leadId,
+          clientName: targetFol.clientName,
+          title: `Next follow-up after ${targetFol.title}`,
+          date: nextFollowupDate,
+          time: '11:00 AM',
+          type: 'Call',
+          assignedTo: targetFol.assignedTo,
+          notes: `Follow-up continuation. Previous outcome: ${outcomeNote}`,
+        });
+      }
+    }
+
     addNotification({
       title: 'Follow-up Completed',
-      description: `Follow-up completed: ${note}`,
-      category: 'orange',
-      relatedRecord: 'Follow-up Record',
-    });
-    markQaPassed('Followups');
-  };
-
-  // STEP 4: Convert Lead to Opportunity
-  const convertLeadToOpportunity = (lead) => {
-    const opp = {
-      id: `opp-${Date.now()}`,
-      name: `${lead.name} Deal`,
-      customer: lead.name,
-      service: lead.service || 'Website Development',
-      value: lead.value || 1500000,
-      probability: '60%',
-      expectedClose: lead.expectedClose || '2026-05-15',
-      assignedTo: typeof lead.assignedTo === 'object' ? lead.assignedTo.name : (lead.assignedTo || 'Rohan Sharma'),
-      stage: 'new', // Matches OPPORTUNITY_STAGES id 'new'
-      nextAction: 'Collect detailed business requirement scope',
-    };
-
-    setOpportunities((prev) => [opp, ...prev]);
-    setLeads((prev) => prev.map((l) => (l.id === lead.id ? { ...l, stage: 'qualified' } : l)));
-    logActivity('Rohan Sharma', 'converted Lead to Opportunity', lead.name, 'opportunity');
-    addNotification({
-      title: 'Opportunity Created',
-      description: `Opportunity created for ${lead.name} (${formatCurrency(lead.value)})`,
-      category: 'blue',
-      relatedRecord: lead.name,
-    });
-    markQaPassed('Opportunity');
-    return opp;
-  };
-
-  const updateOpportunity = (oppId, updatedFields) => {
-    setOpportunities((prev) =>
-      prev.map((o) => (o.id === oppId ? { ...o, ...updatedFields } : o))
-    );
-    logActivity('Sanjay Verma', 'updated Opportunity parameters', oppId, 'opportunity');
-  };
-
-  const updateOpportunityStage = (oppId, newStage) => {
-    setOpportunities((prev) =>
-      prev.map((o) => (o.id === oppId ? { ...o, stage: newStage } : o))
-    );
-    logActivity('Sanjay Verma', `moved Opportunity stage to ${newStage}`, oppId, 'opportunity');
-    addNotification({
-      title: 'Opportunity Stage Changed',
-      description: `Deal moved to ${newStage.toUpperCase()} stage.`,
-      category: 'purple',
-    });
-  };
-
-  const deleteOpportunity = (oppId) => {
-    setOpportunities((prev) => prev.filter((o) => o.id !== oppId));
-    logActivity('Sanjay Verma', 'archived Opportunity', oppId, 'opportunity');
-    addNotification({
-      title: 'Opportunity Archived',
-      description: 'Opportunity removed from pipeline.',
-      category: 'orange',
-    });
-  };
-
-  // STEP 5 & 6: Requirement
-  const addRequirement = (reqData) => {
-    const req = {
-      id: `req-${Date.now()}`,
-      oppId: reqData.oppId || 'opp-abc',
-      customer: reqData.customer || 'ABC Hospital',
-      scope: reqData.scope || 'OPD Booking, Patient Medical History & Doctor Schedule Portal',
-      features: reqData.features || 'OTP Auth, Razorpay Payment Gateway, WhatsApp SMS Notification',
-      timeline: reqData.timeline || '60 Days SLA',
-      integrations: reqData.integrations || 'HMIS REST APIs, WhatsApp Cloud API',
-      status: 'Draft',
-    };
-    setRequirements((prev) => [req, ...prev]);
-    logActivity('Pooja Nair', 'added Requirement', req.customer, 'requirement');
-    addNotification({
-      title: 'Requirement Added',
-      description: `Business scope collected for ${req.customer}`,
-      category: 'amber',
-      relatedRecord: req.customer,
-    });
-    markQaPassed('Requirement');
-    return req;
-  };
-
-  const markRequirementReady = (reqId) => {
-    setRequirements((prev) =>
-      prev.map((r) => (r.id === reqId ? { ...r, status: 'Ready for Quotation' } : r))
-    );
-    logActivity('Pooja Nair', 'marked Requirement Ready for Quotation', 'ABC Hospital', 'requirement');
-    addNotification({
-      title: 'Requirement Ready',
-      description: 'Requirement approved & ready for quotation generation',
-      category: 'amber',
-      relatedRecord: 'ABC Hospital',
-    });
-    markQaPassed('Requirement');
-  };
-
-  // STEP 7 & 8: Quotation
-  const addQuotation = (quoteData) => {
-    const q = {
-      id: `qt-${Date.now()}`,
-      quotationNumber: quoteData.quotationNumber || `QT-2026-${Math.floor(100 + Math.random() * 900)}`,
-      customer: quoteData.customer || 'ABC Hospital',
-      amount: Number(quoteData.amount) || 1500000,
-      tax: (Number(quoteData.amount) || 1500000) * 0.18,
-      total: (Number(quoteData.amount) || 1500000) * 1.18,
-      status: 'Sent', // Draft | Sent | Accepted | Rejected
-      zohoUrl: quoteData.zohoUrl || 'https://books.zoho.com/estimates/8901239',
-      date: new Date().toISOString().split('T')[0],
-    };
-    setQuotations((prev) => [q, ...prev]);
-    logActivity('Sanjay Verma', 'generated & sent Quotation', `${q.quotationNumber} (${q.customer})`, 'quotation');
-    addNotification({
-      title: 'Quotation Sent',
-      description: `Quotation ${q.quotationNumber} sent to ${q.customer}`,
+      description: `Outcome logged for ${targetFol?.clientName || 'Client'}`,
       category: 'green',
-      relatedRecord: q.customer,
-    });
-    markQaPassed('Quotation');
-    return q;
-  };
-
-  const acceptQuotation = (quoteId) => {
-    let targetQuote = null;
-    setQuotations((prev) =>
-      prev.map((q) => {
-        if (q.id === quoteId) {
-          targetQuote = q;
-          return { ...q, status: 'Accepted' };
-        }
-        return q;
-      })
-    );
-    logActivity('Sanjay Verma', 'marked Quotation Accepted', targetQuote?.customer || 'Customer', 'quotation');
-    addNotification({
-      title: 'Quotation Accepted',
-      description: `Quotation accepted by ${targetQuote?.customer || 'Customer'}! Ready for Project conversion.`,
-      category: 'green',
-      relatedRecord: targetQuote?.customer || 'Quotation',
-    });
-
-    // Step 7: Automatic Customer Creation on Accepted Quotation
-    const custName = targetQuote?.customer || 'New Client';
-    if (!clients.some((c) => c.company.toLowerCase() === custName.toLowerCase())) {
-      setClients((prev) => [
-        {
-          id: `cli-${Date.now()}`,
-          company: custName,
-          contactPerson: 'Decision Maker',
-          totalSpent: targetQuote?.amount || 1500000,
-          activeProjects: 1,
-          status: 'Active',
-          customerType: 'Converted Customer',
-          joinedDate: new Date().toISOString().split('T')[0],
-          notes: 'Created automatically upon Quotation Acceptance.',
-        },
-        ...prev,
-      ]);
-      logActivity('System', 'created Customer Profile', custName, 'customer');
-      addNotification({
-        title: 'Customer Profile Created',
-        description: `Customer profile created successfully for ${custName}.`,
-        category: 'purple',
-        relatedRecord: custName,
-      });
-    }
-
-    markQaPassed('Quotation');
-    markQaPassed('Customer');
-  };
-
-  // STEP 7 & 8: Convert to Project & Auto Customer Creation
-  const convertOppToProject = (customerName = 'ABC Hospital', budget = 1500000) => {
-    // Ensure customer profile exists or create automatically
-    let isNewCustomer = false;
-    if (!clients.some((c) => c.company.toLowerCase() === customerName.toLowerCase())) {
-      isNewCustomer = true;
-      setClients((prev) => [
-        {
-          id: `cli-${Date.now()}`,
-          company: customerName,
-          contactPerson: 'Decision Maker',
-          totalSpent: budget,
-          activeProjects: 1,
-          status: 'Active',
-          customerType: 'Converted Customer',
-          joinedDate: new Date().toISOString().split('T')[0],
-          notes: 'Created automatically upon Opportunity Won conversion.',
-        },
-        ...prev,
-      ]);
-      logActivity('System', 'created Customer Profile', customerName, 'customer');
-      addNotification({
-        title: 'Customer Created',
-        description: 'Customer profile created successfully.',
-        category: 'purple',
-        relatedRecord: customerName,
-      });
-    }
-
-    const proj = {
-      id: `proj-${Date.now()}`,
-      title: `${customerName} Software Implementation`,
-      client: customerName,
-      type: 'Custom Web Application',
-      status: 'in_progress',
-      statusLabel: 'In Progress',
-      priority: 'high',
-      budget: budget,
-      progress: 0, // Starts at 0%
-      startDate: new Date().toISOString().split('T')[0],
-      deadline: '2026-06-30',
-      description: `Custom software implementation built by PEP Software team for ${customerName}.`,
-      team: [
-        { name: 'Sanjay Verma', role: 'Architect', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100' },
-        { name: 'Pooja Nair', role: 'Project Manager', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100' },
-      ],
-      milestones: [
-        { title: 'Project Kickoff & Specs', status: 'in_progress', date: 'Mar 2026' },
-      ],
-      taskStats: { total: 0, completed: 0, inProgress: 0, pending: 0 },
-      tasksCount: 0,
-      completedTasksCount: 0,
-    };
-    setProjects((prev) => [proj, ...prev]);
-
-    logActivity('Pooja Nair', 'converted Deal to Active Project', proj.title, 'project');
-    addNotification({
-      title: 'Project Created',
-      description: `Project created: ${proj.title} (Budget: ${formatCurrency(budget)})`,
-      category: 'green',
-      relatedRecord: customerName,
-    });
-    markQaPassed('Project');
-    markQaPassed('Customer');
-    return proj;
-  };
-
-  // STEP 9: Task Management
-  const addTask = (taskData) => {
-    const targetProjId = taskData.projectId || projects[0]?.id || 'proj-1';
-    const t = {
-      id: `tsk-${Date.now()}`,
-      projectId: targetProjId,
-      title: taskData.title || 'New Sprint Task',
-      columnId: taskData.columnId || 'todo',
-      assignedTo: taskData.assignedTo || 'Alice',
-      priority: taskData.priority || 'high',
-      dueDate: taskData.dueDate || '2026-04-15',
-    };
-    setTasks((prev) => [t, ...prev]);
-
-    // Recalculate project progress
-    setProjects((pPrev) =>
-      pPrev.map((p) => {
-        if (p.id === targetProjId) {
-          const projTasks = tasks.filter((tk) => tk.projectId === targetProjId).concat(t);
-          const completed = projTasks.filter((tk) => tk.columnId === 'completed').length;
-          const progress = Math.round((completed / (projTasks.length || 1)) * 100);
-          return { ...p, progress, tasksCount: projTasks.length, completedTasksCount: completed };
-        }
-        return p;
-      })
-    );
-
-    logActivity(t.assignedTo, 'created Sprint Task', t.title, 'task');
-    addNotification({
-      title: 'Task Assigned',
-      description: `New task assigned to ${t.assignedTo}: ${t.title}`,
-      category: 'blue',
-      relatedRecord: t.title,
-    });
-    markQaPassed('Tasks');
-    return t;
-  };
-
-  const completeTask = (taskId) => {
-    let targetProjectId = null;
-    setTasks((prev) => {
-      const updated = prev.map((t) => {
-        if (t.id === taskId) {
-          targetProjectId = t.projectId;
-          return { ...t, columnId: 'completed' };
-        }
-        return t;
-      });
-      
-      // Auto recalculate project progress %
-      if (targetProjectId) {
-        const projTasks = updated.filter((t) => t.projectId === targetProjectId);
-        const completedCount = projTasks.filter((t) => t.columnId === 'completed').length;
-        const totalCount = projTasks.length;
-        const calcProgress = Math.round((completedCount / (totalCount || 1)) * 100);
-
-        setProjects((pPrev) =>
-          pPrev.map((p) =>
-            p.id === targetProjectId
-              ? { ...p, progress: calcProgress, completedTasksCount: completedCount }
-              : p
-          )
-        );
-      }
-
-      return updated;
-    });
-
-    logActivity('Alice', 'completed Task', 'Sprint Task', 'task');
-    addNotification({
-      title: 'Task Completed',
-      description: 'Sprint task marked completed. Project progress updated.',
-      category: 'green',
-      relatedRecord: 'Project Progress',
-    });
-    markQaPassed('Tasks');
-  };
-
-  // STEP 10: Payment Test
-  const addPayment = (payData) => {
-    const inv = {
-      id: `inv-${Date.now()}`,
-      invoiceNumber: `INV-2026-${Math.floor(100 + Math.random() * 900)}`,
-      client: payData.client || 'ABC Hospital',
-      amount: Number(payData.amount) || 500000,
-      total: (Number(payData.amount) || 500000) * 1.18,
-      status: 'Pending',
-      issueDate: new Date().toISOString().split('T')[0],
-      dueDate: '2026-04-01',
-    };
-    setInvoices((prev) => [inv, ...prev]);
-    logActivity('Sanjay Verma', 'issued Invoice', `${inv.invoiceNumber} for ${inv.client}`, 'payment');
-    markQaPassed('Payments');
-    return inv;
-  };
-
-  const markPaymentPaid = (invoiceId) => {
-    setInvoices((prev) =>
-      prev.map((i) => (i.id === invoiceId ? { ...i, status: 'Paid', paidDate: new Date().toISOString().split('T')[0] } : i))
-    );
-    logActivity('Sanjay Verma', 'received Payment', 'Advance Invoice Cleared', 'payment');
-    addNotification({
-      title: 'Payment Received',
-      description: 'Payment verified & cleared. Remaining balance recalculated.',
-      category: 'green',
-      relatedRecord: 'Payment Milestone',
-    });
-    markQaPassed('Payments');
-  };
-
-  // STEP 11: Project Completion with Strict Validation
-  const completeProject = (projectId) => {
-    const targetProj = projects.find((p) => p.id === projectId);
-    if (!targetProj) return { success: false, message: 'Project not found' };
-
-    // Validation 1: All tasks for this project must be completed
-    const projTasks = tasks.filter((t) => t.projectId === projectId);
-    const incompleteTasks = projTasks.filter((t) => t.columnId !== 'completed');
-    if (incompleteTasks.length > 0) {
-      return {
-        success: false,
-        message: `Cannot complete project: ${incompleteTasks.length} task(s) are still incomplete. Complete all tasks first.`,
-      };
-    }
-
-    // Validation 2: Pending amount must be ₹0
-    const projInvoices = invoices.filter(
-      (inv) => inv.client.toLowerCase() === targetProj.client.toLowerCase() && inv.status !== 'Paid'
-    );
-    const pendingSum = projInvoices.reduce((sum, i) => sum + i.total, 0);
-    if (pendingSum > 0) {
-      return {
-        success: false,
-        message: `Cannot complete project: Pending payment of ${formatCurrency(pendingSum)} remaining. All invoices must be Paid.`,
-      };
-    }
-
-    // Allowed completion
-    setProjects((prev) =>
-      prev.map((p) => (p.id === projectId ? { ...p, status: 'completed', progress: 100, statusLabel: 'Completed' } : p))
-    );
-    logActivity('Pooja Nair', 'marked Project Completed', targetProj.title, 'project');
-    addNotification({
-      title: 'Project Completed Successfully',
-      description: `${targetProj.title} project delivered & completed!`,
-      category: 'emerald',
-      relatedRecord: targetProj.client,
-    });
-    markQaPassed('Project');
-    return { success: true };
-  };
-
-  // AUTO SIMULATE FULL 12-STEP WORKFLOW
-  const simulateFullWorkflow = () => {
-    // Step 1: Lead
-    const newLeadObj = addLead({
-      name: 'ABC Hospital',
-      contact: 'Dr. Ramesh Sharma',
-      role: 'Medical Director',
-      email: 'ramesh@abchospital.org',
-      value: 1500000,
-      service: 'Website Development',
-      assignedTo: 'Rohan Sharma',
-    });
-
-    // Step 2 & 3: Followup
-    const fol = addFollowup({
-      leadId: newLeadObj.id,
-      clientName: 'ABC Hospital',
-      title: 'Discovery & Scope Call',
-    });
-    completeFollowup(fol.id, 'Client Approved Scope');
-
-    // Step 4: Convert Opp
-    const opp = convertLeadToOpportunity(newLeadObj);
-
-    // Step 5 & 6: Requirement
-    const req = addRequirement({
-      oppId: opp.id,
-      customer: 'ABC Hospital',
-      scope: 'Patient OPD Portal & Appointment Scheduler',
-    });
-    markRequirementReady(req.id);
-
-    // Step 7 & 8: Quotation
-    const quote = addQuotation({
-      customer: 'ABC Hospital',
-      amount: 1500000,
-    });
-    acceptQuotation(quote.id);
-
-    // Step 9: Project
-    const proj = convertOppToProject('ABC Hospital', 1500000);
-
-    // Step 10: Tasks
-    const t1 = addTask({ projectId: proj.id, title: 'Database & OPD Schema Setup', assignedTo: 'Alice' });
-    const t2 = addTask({ projectId: proj.id, title: 'Patient Appointment UI', assignedTo: 'Vishal Kumar' });
-    const t3 = addTask({ projectId: proj.id, title: 'Razorpay Payment Gateway Integration', assignedTo: 'Pooja Nair' });
-    const t4 = addTask({ projectId: proj.id, title: 'WhatsApp SMS Notification Webhook', assignedTo: 'Alice' });
-    const t5 = addTask({ projectId: proj.id, title: 'UAT & Deployment', assignedTo: 'Vishal Kumar' });
-
-    completeTask(t1.id);
-    completeTask(t2.id);
-    completeTask(t3.id);
-    completeTask(t4.id);
-    completeTask(t5.id);
-
-    // Step 11: Payment
-    const inv = addPayment({ client: 'ABC Hospital', amount: 1500000 });
-    markPaymentPaid(inv.id);
-
-    // Step 12: Complete Project
-    completeProject(proj.id);
-  };
-
-  const seedDemoData = () => {
-    setLeads(INITIAL_LEADS);
-    setFollowups(INITIAL_FOLLOWUPS);
-    setOpportunities(INITIAL_OPPORTUNITIES);
-    setProjects(INITIAL_PROJECTS);
-    setTasks(INITIAL_TASKS);
-    setActivities(INITIAL_ACTIVITIES);
-    addNotification({
-      title: 'Demo Data Seeded',
-      description: 'CRM seeded with 5 fresh leads, 5 employees, and active projects.',
-      category: 'purple',
     });
   };
 
-  const resetCRMData = () => {
-    setLeads([]);
-    setFollowups([]);
-    setOpportunities([]);
-    setRequirements([]);
-    setQuotations([]);
-    setProjects([]);
-    setTasks([]);
-    setInvoices([]);
-    setActivities([]);
-    addNotification({
-      title: 'CRM Reset',
-      description: 'All in-memory mock data reset.',
-      category: 'orange',
-    });
+  const deleteFollowup = (id) => {
+    setFollowups((prev) => prev.filter((f) => f.id !== id));
+  };
+
+  const updateCompanySettings = (newSettings) => {
+    setCompanySettings((prev) => ({ ...prev, ...newSettings }));
   };
 
   return (
     <CRMContext.Provider
       value={{
-        isTestingMode,
-        setIsTestingMode,
-        employees: INITIAL_EMPLOYEES,
+        companySettings,
+        updateCompanySettings,
+        employees,
+        setEmployees,
         leads,
         followups,
-        opportunities,
-        requirements,
-        quotations,
-        clients,
-        projects,
-        tasks,
-        invoices,
-        activities,
-        qaChecklist,
+        customers,
+        clients: customers, // alias for backward compatibility
 
         // Handlers
         addLead,
         updateLead,
+        deleteLead,
+        addNoteToLead,
+        convertLeadToCustomer,
         addFollowup,
         completeFollowup,
-        convertLeadToOpportunity,
-        updateOpportunity,
-        updateOpportunityStage,
-        deleteOpportunity,
-        addRequirement,
-        markRequirementReady,
-        addQuotation,
-        acceptQuotation,
-        convertOppToProject,
-        addTask,
-        completeTask,
-        addPayment,
-        markPaymentPaid,
-        completeProject,
-        simulateFullWorkflow,
-        seedDemoData,
-        resetCRMData,
+        deleteFollowup,
       }}
     >
       {children}
@@ -994,6 +480,4 @@ export const useCRM = () => {
   return context;
 };
 
-function formatCurrency(val) {
-  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(val);
-}
+export default CRMContext;

@@ -6,7 +6,7 @@ export const PrimaryButton = ({
   children,
   onClick,
   type = 'button',
-  variant = 'purple', // 'purple' | 'orange' | 'gold' | 'dark'
+  variant = 'purple', // 'purple' | 'orange' | 'gold' | 'dark' | 'emerald'
   size = 'md', // 'sm' | 'md' | 'lg'
   disabled = false,
   loading = false,
@@ -26,6 +26,7 @@ export const PrimaryButton = ({
     purple: 'bg-brand-primary hover:bg-brand-hover text-white shadow-sm active:scale-[0.98]',
     orange: 'bg-brand-accent hover:bg-amber-600 text-white shadow-sm active:scale-[0.98]',
     gold: 'bg-amber-500 hover:bg-amber-600 text-white shadow-sm active:scale-[0.98]',
+    emerald: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm active:scale-[0.98]',
     dark: 'bg-slate-900 hover:bg-slate-800 text-white shadow-sm active:scale-[0.98]',
   };
 

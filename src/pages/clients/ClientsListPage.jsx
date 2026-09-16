@@ -1,435 +1,121 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PageTransition from '../../components/common/PageTransition';
-import PageHeader from '../../components/layout/PageHeader';
-import Card from '../../components/cards/Card';
-import Table from '../../components/tables/Table';
-import Pagination from '../../components/tables/Pagination';
-import Badge from '../../components/common/Badge';
-import EmptyState from '../../components/common/EmptyState';
-import SearchBar from '../../components/forms/SearchBar';
-import Select from '../../components/forms/Select';
-import PrimaryButton from '../../components/buttons/PrimaryButton';
-import SecondaryButton from '../../components/buttons/SecondaryButton';
-import OutlineButton from '../../components/buttons/OutlineButton';
-import Modal from '../../components/modal/Modal';
-import Input from '../../components/forms/Input';
-import TextArea from '../../components/forms/TextArea';
-import { mockClients } from '../../utils/mockData';
-import { formatCurrency, formatDate } from '../../utils/formatters';
-import { useNotifications } from '../../context/NotificationContext';
-import { useCRM } from '../../context/CRMContext';
 import {
-  Plus,
-  Download,
   Building2,
-  ExternalLink,
-  Mail,
+  Search,
+  Plus,
   Phone,
-  MoreVertical,
-  Filter,
-  Eye,
-  Edit,
-  Trash2,
+  Mail,
+  Calendar,
+  CheckCircle2,
+  ChevronRight,
+  ExternalLink,
 } from 'lucide-react';
+import { useCRM } from '../../context/CRMContext';
 
 export const ClientsListPage = () => {
-  const crm = useCRM();
-  const rawClients = crm?.clients || mockClients;
-  
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('All');
-  const [sortBy, setSortBy] = useState('name');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [newClient, setNewClient] = useState({});
-  const { showSuccess, showInfo } = useNotifications();
   const navigate = useNavigate();
+  const { customers, leads } = useCRM();
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const pageSize = 5;
+  const filteredCustomers = customers.filter(
+    (c) =>
+      c.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.contactPerson.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (c.phone && c.phone.includes(searchQuery))
+  );
 
-  const clients = useMemo(() => {
-    return rawClients.map((c) => ({
-      ...c,
-      logo: c.logo || (c.company || 'NE').substring(0, 2).toUpperCase(),
-      logoBg: c.logoBg || 'bg-purple-600',
-      industry: c.industry || 'Software & Services',
-      role: c.role || 'Executive',
-      email: c.email || 'client@company.com',
-      phone: c.phone || '+91 98000 00000',
-      projectsCount: c.projectsCount || c.activeProjects || 1,
-      customerType: c.customerType || 'Converted Customer',
-    }));
-  }, [rawClients]);
-
-  // Filtering & Sorting
-  const filteredClients = useMemo(() => {
-    return clients
-      .filter((client) => {
-        const matchesSearch =
-          client.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          client.contactPerson.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          client.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          client.industry.toLowerCase().includes(searchQuery.toLowerCase());
-
-        const matchesStatus =
-          statusFilter === 'All' || client.status.toLowerCase() === statusFilter.toLowerCase();
-
-        return matchesSearch && matchesStatus;
-      })
-      .sort((a, b) => {
-        if (sortBy === 'name') return a.company.localeCompare(b.company);
-        if (sortBy === 'spent') return (b.totalSpent || 0) - (a.totalSpent || 0);
-        if (sortBy === 'projects') return (b.projectsCount || 0) - (a.projectsCount || 0);
-        return 0;
-      });
-  }, [clients, searchQuery, statusFilter, sortBy]);
-
-  const paginatedClients = useMemo(() => {
-    const start = (currentPage - 1) * pageSize;
-    return filteredClients.slice(start, start + pageSize);
-  }, [filteredClients, currentPage]);
-
-  const totalPages = Math.ceil(filteredClients.length / pageSize) || 1;
-
-  const handleAddClient = (e) => {
-    e.preventDefault();
-    const created = {
-      id: `cli-${Date.now()}`,
-      company: newClient.company || 'Existing Client Corp',
-      logo: (newClient.company || 'EC').substring(0, 2).toUpperCase(),
-      logoBg: 'bg-purple-600',
-      contactPerson: newClient.contactPerson || 'Contact Person',
-      role: newClient.role || 'Director',
-      email: newClient.email || 'contact@client.com',
-      phone: newClient.phone || '+91 99000 00000',
-      website: newClient.website || 'https://client.com',
-      address: newClient.address || 'India',
-      industry: newClient.industry || 'Services',
-      projectsCount: 1,
-      activeProjects: 1,
-      totalSpent: 0,
-      status: 'Active',
-      customerType: 'Manual Customer',
-      joinedDate: new Date().toISOString().split('T')[0],
-      about: newClient.about || 'Manually added customer (Old client / AMC / Support contract).',
-    };
-
-    if (crm?.clients) {
-      // push to context
-      crm.clients.unshift(created);
-    }
-    setIsAddModalOpen(false);
-    setNewClient({});
-    showSuccess(`Manual Customer ${created.company} added successfully!`);
+  const formatCurrency = (num) => {
+    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(num || 0);
   };
-
-  const handleExport = () => {
-    showInfo('Exporting client roster in CSV format...');
-  };
-
-  const columns = [
-    {
-      header: 'Company & Domain',
-      key: 'company',
-      render: (client) => (
-        <div className="flex items-center gap-3">
-          <div
-            className={`w-10 h-10 rounded-[14px] ${client.logoBg} text-white font-bold text-xs flex items-center justify-center shadow-xs shrink-0`}
-          >
-            {client.logo}
-          </div>
-          <div>
-            <span className="font-bold text-slate-900 group-hover:text-brand-primary block font-heading">
-              {client.company}
-            </span>
-            <span className="text-[11px] text-slate-400 font-medium">{client.industry}</span>
-          </div>
-        </div>
-      ),
-    },
-    {
-      header: 'Type',
-      key: 'customerType',
-      render: (client) => (
-        <Badge
-          variant={client.customerType === 'Manual Customer' ? 'amber' : 'purple'}
-        >
-          {client.customerType || 'Converted Customer'}
-        </Badge>
-      ),
-    },
-    {
-      header: 'Contact Person',
-      key: 'contactPerson',
-      render: (client) => (
-        <div>
-          <p className="font-semibold text-slate-800 text-xs">{client.contactPerson}</p>
-          <p className="text-[11px] text-slate-400">{client.role}</p>
-        </div>
-      ),
-    },
-    {
-      header: 'Contact Info',
-      key: 'email',
-      render: (client) => (
-        <div className="space-y-0.5 text-xs text-slate-500">
-          <p className="flex items-center gap-1 text-[11px] text-slate-600">
-            <Mail className="w-3 h-3 text-slate-400" />
-            <span className="truncate max-w-[150px]">{client.email}</span>
-          </p>
-          <p className="flex items-center gap-1 text-[11px] text-slate-400">
-            <Phone className="w-3 h-3 text-slate-400" />
-            <span>{client.phone}</span>
-          </p>
-        </div>
-      ),
-    },
-    {
-      header: 'Active Projects',
-      key: 'projectsCount',
-      render: (client) => (
-        <div className="text-xs">
-          <span className="font-bold text-slate-800">{client.activeProjects} active</span>
-          <span className="text-slate-400 text-[11px] block">({client.projectsCount} total)</span>
-        </div>
-      ),
-    },
-    {
-      header: 'Total Value',
-      key: 'totalSpent',
-      render: (client) => (
-        <span className="font-bold text-slate-900 font-sans text-xs">
-          {formatCurrency(client.totalSpent || 0)}
-        </span>
-      ),
-    },
-    {
-      header: 'Status',
-      key: 'status',
-      render: (client) => (
-        <Badge
-          dot
-          variant={
-            client.status === 'Active'
-              ? 'success'
-              : client.status === 'Pending'
-              ? 'warning'
-              : 'neutral'
-          }
-        >
-          {client.status}
-        </Badge>
-      ),
-    },
-    {
-      header: 'Actions',
-      key: 'actions',
-      render: (client) => (
-        <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
-          <button
-            type="button"
-            onClick={() => navigate(`/clients/${client.id}`)}
-            className="p-1.5 text-slate-400 hover:text-brand-primary hover:bg-purple-50 rounded-lg transition-colors"
-            title="View Details"
-          >
-            <Eye className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => showInfo(`Editing client profile: ${client.company}`)}
-            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-            title="Edit"
-          >
-            <Edit className="w-4 h-4" />
-          </button>
-        </div>
-      ),
-    },
-  ];
 
   return (
-    <PageTransition>
-      <PageHeader
-        title="Client Portfolio"
-        subtitle="Manage client accounts, contracts, project linkages, and billing profiles."
-        breadcrumbs={[{ label: 'Clients' }]}
-        actions={
-          <>
-            <OutlineButton icon={Download} size="sm" onClick={handleExport}>
-              Export List
-            </OutlineButton>
-            <PrimaryButton
-              variant="orange"
-              size="sm"
-              icon={Plus}
-              onClick={() => setIsAddModalOpen(true)}
-            >
-              Add Client
-            </PrimaryButton>
-          </>
-        }
-      />
+    <div className="w-full space-y-6 pb-10">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-[22px] border border-slate-100 shadow-2xs">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            Customers Roster
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-700">
+              {customers.length} Converted
+            </span>
+          </h1>
+          <p className="text-xs text-slate-500 mt-1">
+            Converted leads and long-term client accounts for Pep Software.
+          </p>
+        </div>
 
-      {/* Filter and Search Bar */}
-      <Card className="mb-6 !p-4">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
-          <SearchBar
+        <div className="w-full md:w-72 relative">
+          <Search className="w-3.5 h-3.5 absolute left-3 top-3 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search customer company, contact..."
             value={searchQuery}
-            onChange={setSearchQuery}
-            onClear={() => setSearchQuery('')}
-            placeholder="Search by company, person, domain..."
-            className="max-w-md w-full"
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-8 pr-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
-
-          <div className="flex items-center gap-3 w-full lg:w-auto overflow-x-auto">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-slate-500 whitespace-nowrap">Status:</span>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 rounded-[12px] px-3 py-2 outline-none focus:ring-2 focus:ring-purple-400/20"
-              >
-                <option value="All">All Statuses</option>
-                <option value="Active">Active</option>
-                <option value="Pending">Pending</option>
-              </select>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-slate-500 whitespace-nowrap">Sort By:</span>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700 rounded-[12px] px-3 py-2 outline-none focus:ring-2 focus:ring-purple-400/20"
-              >
-                <option value="name">Company Name (A-Z)</option>
-                <option value="spent">Total Spend (High to Low)</option>
-                <option value="projects">Projects Count</option>
-              </select>
-            </div>
-          </div>
         </div>
-      </Card>
+      </div>
 
-      {/* Clients Table */}
-      {paginatedClients.length > 0 ? (
-        <div className="space-y-4">
-          <Table
-            columns={columns}
-            data={paginatedClients}
-            onRowClick={(client) => navigate(`/clients/${client.id}`)}
-          />
-          <Card className="!p-2">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalItems={filteredClients.length}
-              pageSize={pageSize}
-              onPageChange={setCurrentPage}
-            />
-          </Card>
-        </div>
-      ) : (
-        <Card>
-          <EmptyState
-            icon={Building2}
-            title="No Clients Matched"
-            description="We couldn't find any client matching your search criteria. You can clear filters or add a new account."
-            actionLabel="Add Client Now"
-            onAction={() => setIsAddModalOpen(true)}
-          />
-        </Card>
-      )}
-
-      {/* Add Client Modal */}
-      <Modal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        title="Add New Client Account"
-        subtitle="Register a new software enterprise customer in the CRM."
-        footer={
-          <>
-            <SecondaryButton onClick={() => setIsAddModalOpen(false)}>Cancel</SecondaryButton>
-            <PrimaryButton onClick={handleAddClient} variant="orange">
-              Save Client Account
-            </PrimaryButton>
-          </>
-        }
-      >
-        <form onSubmit={handleAddClient} className="space-y-4">
-          <Input
-            label="Company Name"
-            placeholder="e.g. Apex Global Logistics"
-            value={newClient.company || ''}
-            onChange={(e) => setNewClient({ ...newClient, company: e.target.value })}
-            required
-          />
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input
-              label="Contact Person"
-              placeholder="e.g. Rahul Kapoor"
-              value={newClient.contactPerson || ''}
-              onChange={(e) => setNewClient({ ...newClient, contactPerson: e.target.value })}
-              required
-            />
-            <Input
-              label="Designation / Role"
-              placeholder="e.g. Co-Founder & COO"
-              value={newClient.role || ''}
-              onChange={(e) => setNewClient({ ...newClient, role: e.target.value })}
-            />
+      {/* CUSTOMER GRID */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {filteredCustomers.length === 0 ? (
+          <div className="col-span-full p-12 text-center bg-white rounded-[22px] border border-slate-100 space-y-2">
+            <Building2 className="w-10 h-10 text-slate-300 mx-auto" />
+            <p className="text-xs font-bold text-slate-700">No customer profiles found</p>
+            <p className="text-[11px] text-slate-500">
+              Convert won leads from the Leads page to add them to the Customer roster.
+            </p>
           </div>
+        ) : (
+          filteredCustomers.map((cust) => (
+            <div
+              key={cust.id}
+              className="p-5 rounded-[22px] bg-white border border-slate-100 shadow-2xs hover:border-purple-300 transition-all space-y-4 flex flex-col justify-between"
+            >
+              <div className="space-y-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900">{cust.company}</h3>
+                    <p className="text-xs text-slate-500">{cust.contactPerson} {cust.role ? `• ${cust.role}` : ''}</p>
+                  </div>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                    Active
+                  </span>
+                </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input
-              label="Email Address"
-              type="email"
-              placeholder="rahul@company.in"
-              value={newClient.email || ''}
-              onChange={(e) => setNewClient({ ...newClient, email: e.target.value })}
-              required
-            />
-            <Input
-              label="Phone Number"
-              placeholder="+91 98450 00000"
-              value={newClient.phone || ''}
-              onChange={(e) => setNewClient({ ...newClient, phone: e.target.value })}
-            />
-          </div>
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-1.5 text-xs">
+                  <div className="flex items-center justify-between text-slate-600">
+                    <span className="text-[11px] text-slate-400">Service Delivered:</span>
+                    <span className="font-bold text-purple-700">{cust.serviceUsed || 'Custom Software'}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-slate-600">
+                    <span className="text-[11px] text-slate-400">Account Value:</span>
+                    <span className="font-bold text-slate-900">{formatCurrency(cust.totalSpent)}</span>
+                  </div>
+                </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Input
-              label="Official Website"
-              placeholder="https://company.in"
-              value={newClient.website || ''}
-              onChange={(e) => setNewClient({ ...newClient, website: e.target.value })}
-            />
-            <Select
-              label="Industry"
-              options={[
-                'Enterprise SaaS',
-                'HealthTech & Supply Chain',
-                'Fintech & Lending',
-                'Direct-to-Consumer Retail',
-                'Media & Entertainment',
-                'Industrial IoT & Robotics',
-              ]}
-              value={newClient.industry || ''}
-              onChange={(e) => setNewClient({ ...newClient, industry: e.target.value })}
-            />
-          </div>
+                <div className="space-y-1 text-xs text-slate-600">
+                  <p className="flex items-center gap-2">📞 {cust.phone || 'N/A'}</p>
+                  {cust.email && <p className="flex items-center gap-2">✉️ {cust.email}</p>}
+                </div>
+              </div>
 
-          <TextArea
-            label="Company Background & Scope"
-            placeholder="Key notes regarding the client's business model and requirements..."
-            value={newClient.about || ''}
-            onChange={(e) => setNewClient({ ...newClient, about: e.target.value })}
-          />
-        </form>
-      </Modal>
-    </PageTransition>
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                <span className="text-[10px] text-slate-400 font-mono">Customer since {cust.joinedDate || '2026'}</span>
+                <button
+                  type="button"
+                  onClick={() => navigate(`/customers/${cust.id}`)}
+                  className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-purple-100 text-slate-700 text-xs font-bold flex items-center gap-1"
+                >
+                  View Profile <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
   );
 };
 
